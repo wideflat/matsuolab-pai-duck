@@ -9,3 +9,5 @@ wandb/
 runs/
 .ipynb_checkpoints/
 .DS_Store
+.claude/compact/
+.claude/settings.local.json
