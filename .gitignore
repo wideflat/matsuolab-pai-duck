@@ -1,0 +1,11 @@
+checkpoints/*
+videos/*
+!checkpoints/.gitkeep
+!videos/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+wandb/
+runs/
+.ipynb_checkpoints/
+.DS_Store
