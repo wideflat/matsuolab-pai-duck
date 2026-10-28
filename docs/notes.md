@@ -80,3 +80,16 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 21:28 -0400 **GPU 起動**: g6.xlarge (L4), us-east-1c, `i-076e1704e8f8776fc`, AMI `ami-041bfdc361a4a68ef`（DLAMI Ubuntu 22.04 20261027）, EBS gp3 100 GB。目的: スモーク学習で steps/s を測る。
 - 作成したリソース（すべて `project=matsuolab-pai-duck`）: キーペア `matsuolab-pai-duck`（秘密鍵 `~/.ssh/matsuolab-pai-duck.pem`）、セキュリティグループ `sg-0c41d5282a8d863ab`（22 番を 67.247.48.58/32 のみ）。インスタンスは `instance-initiated-shutdown-behavior=terminate`。
 - 終了時に削除するもの: インスタンス（ボリュームは連動削除）、SG、キーペア（再利用するなら残す）。
+- 21:48 -0400 **GPU 停止（インスタンス削除）**: `i-076e1704e8f8776fc` を terminate（2026-10-28 01:48:26 GMT）。稼働約 20 分、概算 $0.3（$0.8048/h）。関連ボリュームは残っていないことを確認。残したもの: キーペア `matsuolab-pai-duck`、セキュリティグループ `sg-0c41d5282a8d863ab`（どちらも無料。次回の学習で再利用）。
+- 自分の IP が変わったら SG の許可 IP を更新する必要がある。
+
+## 2026-10-27 フェーズ 5 準備: スモーク学習（AWS）
+**動く環境（Open_Duck_Playground HEAD b9be205 + 下記の固定）。`configs/requirements-aws-train.txt` に全パッケージの版を保存。**
+- Python 3.12.16（uv が既定で 3.15 を選び onnxruntime が入らないので `--python 3.12` が必要）
+- `jax[cuda12]==0.7.0`, `jaxlib==0.7.0`, `brax==0.12.5`, `mujoco==3.3.4`, `mujoco-mjx==3.3.4`, `playground==0.0.5`（他は uv の解決どおり: flax / orbax / tensorflow 2.21.0 / onnxruntime 1.31.1 など）
+- **公式の `uv sync` のままでは動かない。** 理由: (1) `playground` の最新 0.2.0 には `mujoco_playground._src.collision` が無い（`joystick.py` が import に失敗）。(2) `jax` 0.12 では `jax.device_put_replicated` が削除されており brax 0.14.2 が落ちる。2025 年夏に揃う版へ固定して解決した。
+- 学習は `playground/open_duck_mini_v2/runner.py --task flat_terrain_backlash --num_timesteps N --output_dir ...`。runner の既定は **1.5 億ステップ**（README の例は 3 億）。
+- PPO の設定（ログから）: `clipping_epsilon` 0.2、`num_envs` 8192、`batch_size` 256、`num_minibatches` 32、`num_updates_per_batch` 4、`unroll_length` 20、`discounting` 0.97、`entropy_cost` 0.005、`learning_rate` 3e-4、`episode_length` 1000、`num_evals` 15。観測 101 次元、行動 14 次元。
+- 評価ごとにチェックポイント（orbax）と ONNX が自動で保存される。`--restore_checkpoint_path` で再開できる。
+- コンパイル込みの立ち上がりは約 3 分。以降 49 万ステップごとに約 18 秒＝**約 2.7 万ステップ/秒**（g6.xlarge, L4）。ここから見積り: **1.5 億ステップ ≒ 1.6 時間（約 $1.3）、3 億ステップ ≒ 3.1 時間（約 $2.5）**。予算 $20 に十分収まる。
+- 回収: `checkpoints/smoke_20261028/`（git 管理外、39 MB）。
