@@ -12,3 +12,4 @@ runs/
 .claude/compact/
 .claude/settings.local.json
 external/
+*.pdf
