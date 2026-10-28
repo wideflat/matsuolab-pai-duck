@@ -95,3 +95,5 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 回収: `checkpoints/smoke_20261028/`（git 管理外、39 MB）。
 
 - 23:13 -0400 **GPU 起動**: g6.xlarge (L4), us-east-1, `i-042e05bd0a5f2b8fc`, 目的: E003 ベースライン学習（5,000 万ステップ）。同じキーペアと SG を再利用。
+- E003 の準備で詰まった点: Mac のシェルは zsh で、`ssh $O host`（オプションを変数にまとめる）は**単語分割されず**、鍵が渡らずに `Permission denied (publickey)` になる。ssh の設定ファイル（`Host duck` に HostName / IdentityFile / UserKnownHostsFile をまとめ、`ssh -F <file> duck`）を使えば解決。ホスト鍵は専用の `~/.ssh/known_hosts_matsuolab-pai-duck` に記録する（AWS の IP は使い回されるため、既定の known_hosts を汚さない）。
+- 23:17 -0400 E003 学習開始（`--num_timesteps 50000000 --output_dir checkpoints_baseline`）。
