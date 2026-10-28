@@ -55,6 +55,11 @@ class DuckRollout:
         if self.fell_at is None and d.qpos[2] < FALL_Z:
             self.fell_at = self.t
 
+    def advance_to(self, t):
+        """Step until sim time reaches t (to within half a physics step); use for video frame timing."""
+        while self.t < t - 0.5 * self.model.opt.timestep:
+            self.step()
+
     @property
     def dx(self):
         return float(self.data.qpos[0]) - self.x0

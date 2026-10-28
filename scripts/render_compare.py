@@ -41,9 +41,9 @@ CAM_LOOKAT, CAM_DIST, CAM_AZ, CAM_EL = (0.36, 0.0, 0.17), 0.9, 90.0, -18.0
 MARK_X = np.round(np.arange(-0.1, 0.91, 0.1), 2)
 
 
-def add_floor_marks(scene, x0):
+def add_floor_marks(scene, x0, marks=MARK_X):
     """Draw thin boxes on the floor every 0.1 m from the start position; start line in red."""
-    for x in MARK_X:
+    for x in marks:
         if scene.ngeom >= scene.maxgeom:
             raise RuntimeError("scene.maxgeom too small for floor marks")
         major = x * 10 % 5 == 0
@@ -127,13 +127,11 @@ def main():
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
                            "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
                            "-crf", "20", str(out)], stdin=subprocess.PIPE)
-    per_frame = round(1 / (FPS * model.opt.timestep))
     n_frames = int(a.seconds * FPS)
     frame = None
-    for _ in range(n_frames):
+    for n in range(n_frames):
         for r in rollouts:
-            for _ in range(per_frame):
-                r.step()
+            r.advance_to((n + 1) / FPS)
         frame = Image.new("RGB", (W, H), SURFACE)
         frame.paste(strip, (0, H - STRIP))
         draw = ImageDraw.Draw(frame)

@@ -66,7 +66,6 @@ def main():
                            "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
                            "-crf", "20", a.out], stdin=subprocess.PIPE)
     base_xy = home_qpos[0:2].copy()
-    per_frame = round(1 / (FPS * m.opt.timestep))
     frame = None
     for n in range(int(a.seconds * FPS)):
         t = n / FPS
@@ -83,8 +82,7 @@ def main():
         mujoco.mj_forward(m, d_ref)
         d_ref.qpos[2] -= min(d_ref.geom_xpos[i][2] for i in foot_ids) - floor_z
         mujoco.mj_forward(m, d_ref)
-        for _ in range(per_frame):
-            policy.step()
+        policy.advance_to(t)
 
         frame = Image.new("RGB", (W, H), SURFACE)
         draw = ImageDraw.Draw(frame)
