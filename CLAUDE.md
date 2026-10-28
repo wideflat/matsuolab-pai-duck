@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Open Duck Mini（後に Microduck）の歩行を MuJoCo Playground (MJX) + PPO (Brax) で学習する課題。概要は README.md。
+Open Duck Mini の歩行を MuJoCo Playground (MJX) + PPO (Brax) で学習する課題。概要は README.md。**実機はなく、スコープはシミュレーターまで。**
 
 ## 背景
 東大 松尾研の講座「フィジカルAI応用編」の最終課題として、このリポジトリで進める。提出物は README.md のチェックリスト参照。
@@ -13,7 +13,7 @@ Open Duck Mini（後に Microduck）の歩行を MuJoCo Playground (MJX) + PPO (
 - 学習は GPU マシン、手元は確認用（viewer・ロールアウト）。
 
 ## Rules and handoff
-- Detailed rules live in `.claude/rules/` (English): `experiments.md`, `workflow.md`, `testing.md`, `coding-style.md`, `gpu-cost.md`, `sim2real-safety.md`. Read the relevant one before acting.
+- Detailed rules live in `.claude/rules/` (English): `experiments.md`, `workflow.md`, `testing.md`, `coding-style.md`, `gpu-cost.md`. Read the relevant one before acting.
 - Branches: `main` (default, presentable) and `dev` (daily work). Never commit directly to `main`; never push unless asked.
 - Session handoff: `docs/handoff/HANDOFF.md`. Compact hooks in `.claude/hooks/` point at it.
 - Progress / events go in `docs/notes.md` (no separate progress notes).

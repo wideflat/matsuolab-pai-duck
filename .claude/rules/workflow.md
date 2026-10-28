@@ -10,7 +10,9 @@
   rewrite). Merge it into `dev` with `--no-ff`, then delete it with `git branch -d` (never `-D`).
 - Commit with explicit paths (`git add <path> ...`), never `git add -A`, so a stray file
   (checkpoint, video, key) cannot slip in.
-- Commit after each working step; keep commits small.
+- **Commit whenever files change** (authorized by the user, 2026-10-27): after each logical change,
+  on `dev`, with explicit paths. Small commits; never batch unrelated changes. This covers
+  commits only; push and merging into `main` still need the user's request.
 - Never `git push` unless the user asks.
 
 ## Commit message format
@@ -43,4 +45,4 @@ Types: `feat` `fix` `refactor` `docs` `test` `chore` `perf` `exp`
 - Do not edit files outside this repository.
 - No new dependencies unless the user or a documented step names them.
 - Never commit checkpoints, videos, API keys, or wandb tokens.
-- Anything that moves the real robot follows `sim2real-safety.md`.
+- Scope is simulation only (no real robot). Nothing here sends commands to hardware.

@@ -3,7 +3,7 @@
 This is RL experiment code, not a service. There is no coverage gate and TDD is not mandatory.
 What must hold is that the pieces that silently break training or deployment are checked.
 
-## Required checks
+## Required checks (simulation only)
 
 1. **Environment shapes**: observation and action dimensions match the config and the policy
    network input/output. Assert on shape and dtype, not just values.
@@ -12,9 +12,7 @@ What must hold is that the pieces that silently break training or deployment are
 3. **ONNX parity**: the exported ONNX policy and the JAX policy give the same action on the
    same observation, within an explicit tolerance (e.g. `atol=1e-4`). Never compare floats
    with equality.
-4. **Observation contract (sim vs runtime)**: the observation vector the runtime builds has the
-   same order, scaling and history as the one used in training. Write the order down once and
-   test against it.
+
 
 ## Rules
 
