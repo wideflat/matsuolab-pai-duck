@@ -97,3 +97,5 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 23:13 -0400 **GPU 起動**: g6.xlarge (L4), us-east-1, `i-042e05bd0a5f2b8fc`, 目的: E003 ベースライン学習（5,000 万ステップ）。同じキーペアと SG を再利用。
 - E003 の準備で詰まった点: Mac のシェルは zsh で、`ssh $O host`（オプションを変数にまとめる）は**単語分割されず**、鍵が渡らずに `Permission denied (publickey)` になる。ssh の設定ファイル（`Host duck` に HostName / IdentityFile / UserKnownHostsFile をまとめ、`ssh -F <file> duck`）を使えば解決。ホスト鍵は専用の `~/.ssh/known_hosts_matsuolab-pai-duck` に記録する（AWS の IP は使い回されるため、既定の known_hosts を汚さない）。
 - 23:17 -0400 E003 学習開始（`--num_timesteps 50000000 --output_dir checkpoints_baseline`）。
+- 23:42 -0400 E003 学習終了。速度は 360 万ステップ（評価 1 回分）あたり約 85 秒＝**約 4.2 万ステップ/秒**（スモークの 2.7 万より速い。スモークは評価・保存の負担の比率が大きかった）。回収: `checkpoints/baseline_e003/`（40 MB、15 チェックポイント＋ONNX＋ログ＋TensorBoard）。
+- 23:43 -0400 **GPU 停止（インスタンス削除）**: `i-042e05bd0a5f2b8fc` を terminate（03:43:20 GMT）。稼働約 30 分、概算 $0.4。累計の概算 $0.7 / $20。
