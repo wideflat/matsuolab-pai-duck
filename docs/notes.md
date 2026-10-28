@@ -60,3 +60,18 @@ clone 先: `external/`（このリポジトリの中。`.gitignore` 済みで gi
 
 ## 2026-10-27 GPU 環境の決定
 AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザー決定）。予算上限 $20。
+
+## 2026-10-27 フェーズ 4: リファレンスモーション
+**同梱の `polynomial_coefficients.pkl`（Open_Duck_Playground, open_duck_mini_v2）の中身**（自分で読んで確認）
+- 240 個のモーション。キーは `dx_dy_dtheta`（例 `0.074_-0.037_0.704`）。格子は dx 6 値（-0.148〜0.222）× dy 4 値（±0.111）× dtheta 10 値（-1.111〜1.222）。
+- どのモーションも period 0.54 s、50 fps、1 周期 27 ステップ。各モーションは 40 次元 × 16 係数（多項式）。
+- 現在の generator の `robots/open_duck_mini_v2/auto_gait.json` の掃引範囲（x -0.04〜0.06、y ±0.03、theta ±0.3）とは**一致しない**。同梱 pkl は別の（古い）設定で作られたもので、出所の記録は無い。**generator を今の設定で回しても同じ pkl にはならない。**
+
+**generator（Placo）は Mac では動かない**
+- `placo==0.6.3` の配布 wheel は `manylinux_2_35_x86_64`（cp310）のみ。Mac(arm64) ではソースビルドになり、CMake の設定段階で失敗した。
+- Linux x86_64 なら動くはず（未実行）。git-lfs が必要で、STL は `brew install git-lfs`（brew 経由、`git lfs install --local` と `git lfs pull`）で取得済み。
+- Python は `==3.10.12` を要求。
+
+**結論**
+- ベースライン学習（フェーズ 5）は同梱の pkl をそのまま使えばよい。Placo での再生成は必須ではない。
+- 再生成するなら、Linux x86_64 の小さい CPU インスタンスで行う（GPU 時間を使わない）。GPU 予算 $20 の外で費用がかかるため、実施前にユーザーの承認を取る。再生成した pkl は「別条件の実験」として experiments.md に残し、同梱 pkl とは混ぜない。
