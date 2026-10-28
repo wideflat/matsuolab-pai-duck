@@ -75,3 +75,8 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 **結論**
 - ベースライン学習（フェーズ 5）は同梱の pkl をそのまま使えばよい。Placo での再生成は必須ではない。
 - 再生成するなら、Linux x86_64 の小さい CPU インスタンスで行う（GPU 時間を使わない）。GPU 予算 $20 の外で費用がかかるため、実施前にユーザーの承認を取る。再生成した pkl は「別条件の実験」として experiments.md に残し、同梱 pkl とは混ぜない。
+
+## 2026-10-27 GPU 起動ログ
+- 21:28 -0400 **GPU 起動**: g6.xlarge (L4), us-east-1c, `i-076e1704e8f8776fc`, AMI `ami-041bfdc361a4a68ef`（DLAMI Ubuntu 22.04 20261027）, EBS gp3 100 GB。目的: スモーク学習で steps/s を測る。
+- 作成したリソース（すべて `project=matsuolab-pai-duck`）: キーペア `matsuolab-pai-duck`（秘密鍵 `~/.ssh/matsuolab-pai-duck.pem`）、セキュリティグループ `sg-0c41d5282a8d863ab`（22 番を 67.247.48.58/32 のみ）。インスタンスは `instance-initiated-shutdown-behavior=terminate`。
+- 終了時に削除するもの: インスタンス（ボリュームは連動削除）、SG、キーペア（再利用するなら残す）。
