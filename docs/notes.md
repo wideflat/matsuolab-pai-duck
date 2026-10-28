@@ -109,3 +109,5 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 10/28 ダンス用の曲: FreePD（CC0）は 2025 年に閉鎖済み。Kevin MacLeod（incompetech.com、CC BY 4.0、YouTube 可・収益化可、クレジット必須）から候補を取得 → `videos/music/`（git 管理外）。クレジット表記: `<曲名> Kevin MacLeod (incompetech.com) / Licensed under Creative Commons: By Attribution 4.0 / https://creativecommons.org/licenses/by/4.0/`（概要欄で可）。
 - テンポ実測（`scripts/estimate_bpm.py`、numpy のみ）: Fluffing a Duck **122 BPM**（Shazam の 122 と一致。帯域を区切らない推定は 81 と誤る＝2:3 の取り違え → 帯域ごとに候補を出すよう修正）、Monkeys Spinning Monkeys 144、Pixel Peeker Polka - faster 145、Sneaky Snitch 87。確認用のクリック音入り音声: `videos/music/check_*.m4a`。
 - 歩行リズムの変更の予備確認（E003 最終、各 1 回、ノイズなし）: 位相の進み `phase_rate` を 0.8 / 0.9 / 1.0 / 1.098 / 1.2 / 1.3 倍にしても、ダンス（2 拍ごとに 7 種の指令を切り替え、30 秒）、直進（vx=0.15、10 秒）とも転倒なし。直進 10 秒の距離は 0.245 / 0.429 / 0.562 / 0.621 / 0.588 / 0.542 m。→ 歩行の 1 周期を曲の 1 拍に合わせられる（122 BPM なら 1.098 倍、144 BPM なら 1.296 倍）。
+- 11:33 -0400 E004 学習終了（50,462,720 ステップ、本番の学習は 11:10〜11:33 の約 23 分）。回収: `checkpoints/e004/`（40 MB、15 チェックポイント＋ONNX＋ログ）。最終 ONNX の sha256 は 2f9d1418。
+- 11:34 -0400 **GPU 停止（インスタンス削除）**: `i-0148caba8dc964cd6` を terminate。稼働約 35 分、概算 $0.5。累計の概算 $1.2 / $20。
