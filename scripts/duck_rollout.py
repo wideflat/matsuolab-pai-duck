@@ -3,8 +3,10 @@
 Wraps MjInfer from external/Open_Duck_Playground (read-only) and re-implements only its control loop:
 one call to step() advances one physics step (sim_dt) and runs the policy every `decimation` steps.
 
-Guarantees: deterministic (no noise is added); the control loop matches MjInfer.run() at commit time
-of Playground b9be205; fell_at is the first sim time the base height drops below FALL_Z.
+Guarantees: deterministic (no noise is added); with phase_rate=1 the control loop matches MjInfer.run()
+at Playground b9be205; fell_at is the first sim time the base height drops below FALL_Z.
+phase_rate scales how fast the imitation phase clock advances (1 = trained gait period 0.54 s); values
+other than 1 are outside the training distribution.
 """
 import mujoco
 import numpy as np
@@ -17,11 +19,12 @@ FALL_Z = 0.08  # m, base height below which the robot counts as fallen
 
 
 class DuckRollout:
-    def __init__(self, onnx_path, command, model_path=MODEL, ref_path=REF):
+    def __init__(self, onnx_path, command, model_path=MODEL, ref_path=REF, phase_rate=1.0):
         vx, vy, wz = command
         self.inf = MjInfer(model_path, ref_path, onnx_path, standing=False)
         self.inf.commands[0:3] = [vx, vy, wz]
         self.model, self.data = self.inf.model, self.inf.data
+        self.phase_rate = phase_rate
         self.i = 0
         self.fell_at = None
         self.x0 = float(self.data.qpos[0])
@@ -35,7 +38,7 @@ class DuckRollout:
         mujoco.mj_step(self.model, d)
         self.i += 1
         if self.i % inf.decimation == 0:
-            inf.imitation_i = (inf.imitation_i + 1.0) % inf.PRM.nb_steps_in_period
+            inf.imitation_i = (inf.imitation_i + self.phase_rate) % inf.PRM.nb_steps_in_period
             ph = inf.imitation_i / inf.PRM.nb_steps_in_period * 2 * np.pi
             inf.imitation_phase = np.array([np.cos(ph), np.sin(ph)])
             obs = inf.get_obs(d, inf.commands)
