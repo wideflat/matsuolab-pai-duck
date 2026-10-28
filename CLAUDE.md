@@ -17,3 +17,4 @@ Open Duck Mini の歩行を MuJoCo Playground (MJX) + PPO (Brax) で学習する
 - Branches: `main` (default, presentable) and `dev` (daily work). Never commit directly to `main`; never push unless asked.
 - Session handoff: `docs/handoff/HANDOFF.md`. Compact hooks in `.claude/hooks/` point at it.
 - Progress / events go in `docs/notes.md` (no separate progress notes).
+- 参考リポジトリ（Open_Duck_Playground / Open_Duck_reference_motion_generator）は `external/` に clone 済み（git 管理外）。改造せず、自分の変更は `configs/` と `scripts/` に置く。取得した HEAD は docs/notes.md。

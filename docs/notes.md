@@ -13,7 +13,9 @@
 ## メモ
 
 ## 2026-10-27 フェーズ 0: clone と依存の確認
-clone 先: `/Users/koheikudo/Documents/projects/pai-duck-external/`（このリポジトリの外）
+clone 先: `external/`（このリポジトリの中。`.gitignore` 済みで git 管理外。無ければ同じ URL から clone し直す）
+- https://github.com/apirrone/Open_Duck_Playground
+- https://github.com/apirrone/Open_Duck_reference_motion_generator
 
 | リポジトリ | HEAD | 最終コミット日 |
 |---|---|---|
