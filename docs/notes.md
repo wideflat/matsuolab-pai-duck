@@ -103,3 +103,4 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 比較動画 v2: `scripts/render_compare.py` で 0 / 25.2M / 39.6M / 50.5M の 4 画面を作成（`videos/e003_compare_v2.mp4`、12 秒、定点カメラ、床に 0.1 m ごとの目印、下に報酬と速度のグラフ）。12 秒で各 +0.00 / +0.01 / +0.21 / +0.69 m。
 - 10/28 experiments.md に E004 の行を追加（未実施、判定基準だけ先に登録）。案 A＝前進報酬 2 倍。上書きは `scripts/train_variant.py`（Playground の `config_overrides` を使い、external は改造しない）。playground 0.0.5 の `MjxEnv.__init__` が `config.lock()` → `update_from_flattened_dict` で上書きすることを wheel で確認済み。
 - 10:59 -0400 **GPU 起動**: g6.xlarge (L4), us-east-1, `i-0148caba8dc964cd6`, 目的: E004（前進報酬 2 倍、スモーク＋5,000 万ステップ）。ユーザー承認済み。停止条件: インスタンス内で `shutdown -h +90`（終了時は terminate）。
+- 11:10 -0400 E004 スモーク（`train_variant.py`、100 万ステップ指定で 2,293,760 まで実行）完走。上書きの反映を確認（`tracking_lin_vel: 5.0`）、NaN なし、報酬 14〜18。続けて 5,000 万ステップの本番を開始。
