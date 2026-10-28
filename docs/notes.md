@@ -57,3 +57,6 @@ clone 先: `external/`（このリポジトリの中。`.gitignore` 済みで gi
 - Mac の環境: `.venv`（uv, Python 3.12）に mujoco 3.17.0 / playground 0.2.0 / jax 0.12.0.1（CPU）/ onnxruntime 1.31.1 / numpy 2.5.4 / brax 0.14.2。PyPI のパッケージ名は `mujoco-playground` ではなく `playground`。
 - 公式の `mujoco_infer.py` は GUI の viewer 専用のため、同じ制御ループを再実装した `scripts/replay_headless.py` を使い、数値と GIF（`videos/`、git 管理外）を出した。結果は docs/experiments.md の E001。
 - 公式の viewer 版（`mjpython` が必要）は未実行。
+
+## 2026-10-27 GPU 環境の決定
+AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザー決定）。予算上限 $20。
