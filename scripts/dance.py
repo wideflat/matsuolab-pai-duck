@@ -99,17 +99,21 @@ def main():
                            "-shortest", a.out], stdin=subprocess.PIPE)
     current = ("pose", timeline[0][3])
     marks = []  # (segment index, x, y, yaw) at each segment start, for the per-move summary
+    yaw_prev, yaw_total = yaw_deg(d), 0.0  # unwrapped heading, so turns past 180 deg are counted in full
     for n in range(int(end * FPS)):
         t_frame = (n + 1) / FPS
         while r.t < t_frame - 0.5 * m.opt.timestep:
             seg = next((s for s in timeline if s[0] <= r.t < s[1]), None)
             idx = timeline.index(seg) if seg else -1
             if not marks or marks[-1][0] != idx:
-                marks.append((idx, float(d.qpos[0]), float(d.qpos[1]), yaw_deg(d)))
+                marks.append((idx, float(d.qpos[0]), float(d.qpos[1]), yaw_total))
             current = (seg[2], seg[3]) if seg else ("pose", c["moves"]["pose"])
             move = current[1]
             r.inf.commands[0:3] = list(move["cmd"])
             r.step()
+            yaw_now = yaw_deg(d)
+            yaw_total += (yaw_now - yaw_prev + 180) % 360 - 180
+            yaw_prev = yaw_now
             seg_start = seg[0] if seg else 0.0
             for joint, (amp, period_beats) in move["head"].items():
                 d.ctrl[head[joint]] = default[head[joint]] + amp * np.sin(
@@ -139,11 +143,11 @@ def main():
     ff.stdin.close()
     if ff.wait() != 0:
         raise RuntimeError("ffmpeg failed")
-    marks.append((None, float(d.qpos[0]), float(d.qpos[1]), yaw_deg(d)))
+    marks.append((None, float(d.qpos[0]), float(d.qpos[1]), yaw_total))
     for (idx, x, y, yw), (_, x2, y2, yw2) in zip(marks, marks[1:]):
         if idx is not None and idx >= 0:
             print(f"  {timeline[idx][2]:<12} moved ({x2 - x:+.2f}, {y2 - y:+.2f}) m, "
-                  f"turned {(yw2 - yw + 180) % 360 - 180:+.0f} deg")
+                  f"turned {yw2 - yw:+.0f} deg")
     print(f"wrote {a.out}: {end:.1f} s, phase_rate={phase_rate:.3f}, fell_at={r.fell_at}, "
           f"final xy=({r.dx:.2f}, {d.qpos[1]:.2f})")
 
