@@ -25,5 +25,5 @@ Applies to every GPU environment used for training (Colab, cloud VMs, any rented
 - Use-and-delete: after copying out the checkpoint and logs, terminate the instance and delete its
   volume. Before launching, list instances and volumes (`aws ec2 describe-instances`,
   `describe-volumes`) to confirm nothing is left running.
-- Tag every launch: `Name`, `project=pai-duck`, `lifecycle=ephemeral`.
+- Tag every launch: `Name`, `project=matsuolab-pai-duck`, `lifecycle=ephemeral`.
 - Launching an instance needs the user's approval each time (rule 5 above).
