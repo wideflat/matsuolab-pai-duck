@@ -4,7 +4,8 @@ A choreography JSON (configs/dance_*.json) lists moves and a sequence of (move, 
 joystick command (vx, vy, wz), which the policy was trained to follow, plus optional sinusoidal head
 motions written straight to the head servos (head commands carry no reward in training, so the policy
 does not track them). The gait clock is sped up so one gait cycle lasts `beats_per_gait_cycle` beats,
-and its phase 0 is put on the first beat. Video time equals music time.
+and its phase 0 is put on the first beat. Video time equals music time; the video ends one beat after
+the last move (or at the end of the music) and the audio fades out over the last FADE seconds.
 
 Usage (from the repo root):
   PYTHONPATH=external/Open_Duck_Playground .venv/bin/python scripts/dance.py \
@@ -30,6 +31,7 @@ GAIT_PERIOD = 0.54  # s, period of the trained gait (27 control steps at 50 Hz)
 MAX_SERVO_VEL = 5.24  # rad/s, from Open_Duck_Playground joystick config
 HEAD_JOINTS = ("neck_pitch", "head_pitch", "head_yaw", "head_roll")
 CAM_DIST, CAM_AZ, CAM_EL, FOLLOW = 1.1, 135.0, -18.0, 0.04
+FADE = 1.5  # s, audio fade-out at the end
 
 
 def load_config(path):
@@ -92,6 +94,7 @@ def main():
 
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
                            "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", c["music"], "-map", "0:v", "-map", "1:a",
+                           "-af", f"afade=t=out:st={end - FADE:.3f}:d={FADE}",
                            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-c:a", "aac", "-b:a", "192k",
                            "-shortest", a.out], stdin=subprocess.PIPE)
     current = ("pose", timeline[0][3])

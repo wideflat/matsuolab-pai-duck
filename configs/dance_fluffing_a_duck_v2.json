@@ -1,0 +1,39 @@
+{
+  "music": "videos/music/Fluffing a Duck.mp3",
+  "music_credit": "Music: Fluffing a Duck - Kevin MacLeod (incompetech.com) / CC BY 4.0",
+  "bpm": 122.0,
+  "first_beat": 0.473,
+  "beats_per_gait_cycle": 1,
+  "moves": {
+    "pose":        {"label": "ポーズ",              "cmd": [0.0, 0.0, 0.0],    "head": {}},
+    "nod":         {"label": "うなずき",            "cmd": [0.0, 0.0, 0.0],    "head": {"head_pitch": [0.35, 1]}},
+    "look":        {"label": "きょろきょろ",        "cmd": [0.0, 0.0, 0.0],    "head": {"head_yaw": [0.9, 4]}},
+    "tilt":        {"label": "首かしげ",            "cmd": [0.0, 0.0, 0.0],    "head": {"head_roll": [0.4, 2]}},
+    "march":       {"label": "前進",                "cmd": [0.15, 0.0, 0.0],   "head": {}},
+    "march_shake": {"label": "首を振って前進",      "cmd": [0.15, 0.0, 0.0],   "head": {"head_yaw": [0.6, 2]}},
+    "back":        {"label": "後退",                "cmd": [-0.15, 0.0, 0.0],  "head": {}},
+    "back_nod":    {"label": "うなずきながら後退",  "cmd": [-0.15, 0.0, 0.0],  "head": {"head_pitch": [0.3, 1]}},
+    "side_l":      {"label": "左へカニ歩き",        "cmd": [0.0, 0.2, 0.0],    "head": {"head_roll": [0.25, 2]}},
+    "side_r":      {"label": "右へカニ歩き",        "cmd": [0.0, -0.2, 0.0],   "head": {"head_roll": [0.25, 2]}},
+    "diag_fl":     {"label": "左ななめ前へ",        "cmd": [0.15, 0.2, 0.0],   "head": {}},
+    "diag_br":     {"label": "右ななめ後ろへ",      "cmd": [-0.15, -0.2, 0.0], "head": {}},
+    "spin_l":      {"label": "左回り",              "cmd": [0.0, 0.0, 1.0],    "head": {}},
+    "spin_r":      {"label": "右回り",              "cmd": [0.0, 0.0, -1.0],   "head": {}}
+  },
+  "sequence": [
+    ["pose", 4], ["nod", 4],
+    ["look", 4], ["tilt", 4],
+    ["march", 8],
+    ["back", 8],
+    ["spin_l", 8],
+    ["spin_r", 8],
+    ["side_l", 8], ["side_r", 8],
+    ["march_shake", 8],
+    ["back_nod", 8],
+    ["diag_fl", 4], ["diag_br", 4],
+    ["spin_l", 8],
+    ["spin_r", 8],
+    ["side_r", 8], ["side_l", 8],
+    ["spin_l", 8], ["nod", 4], ["pose", 4]
+  ]
+}
