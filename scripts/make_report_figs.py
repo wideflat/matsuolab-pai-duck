@@ -5,7 +5,7 @@ Usage (from the repo root):
 
 Figures:
   fig_curves.png    evaluation reward and forward speed against training steps (three runs).
-  fig_commands.png  distance / angle covered in 10 s under six commands: base run vs long run.
+  fig_commands.png  distance / angle covered in 10 s under six commands: base run (50M), reward x2 (50M), reward x2 long run (129.8M).
   fig_nav.png, fig_soccer.png, fig_ref.png  single frames cut from videos/final with ffmpeg (needs those clips).
 Guarantees: reads only docs/data/*.csv and videos/final; every CSV row used is looked up by its training step and
 raises if missing; writes only docs/report/fig_*.png. Palette: dataviz categorical order, text in ink tokens.
@@ -58,18 +58,20 @@ def curves():
 
 
 def commands():
-    base, long_ = row_at(rows("e003", "commands"), 50462720), row_at(rows("e005", "commands"), 129761280)
+    base, x2, long_ = (row_at(rows("e003", "commands"), 50462720), row_at(rows("e004", "commands"), 50462720),
+                       row_at(rows("e005", "commands"), 129761280))
     dist = [("前進", "fwd_x_m"), ("後退", "back_x_m"), ("左へ横歩き", "left_y_m"), ("右へ横歩き", "right_y_m")]
     turn = [("左旋回", "turn_l_deg"), ("右旋回", "turn_r_deg")]
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.2), dpi=200, gridspec_kw={"width_ratios": [2, 1]})
     for ax, items, unit in ((axes[0], dist, "10 秒で進んだ距離 [m](向きは指令の向きを正)"), (axes[1], turn, "10 秒で回った角度 [度]")):
         x = np.arange(len(items))
-        for k, (r, c, lab) in enumerate(((base, COLORS[0], "基本の学習(5,000 万)"), (long_, COLORS[2], "報酬 2 倍で長く学習(1.3 億)"))):
+        for k, (r, c, lab) in enumerate(((base, COLORS[0], "基本の学習(5,000 万)"), (x2, COLORS[1], "報酬 2 倍(5,000 万)"),
+                                         (long_, COLORS[2], "報酬 2 倍で長く学習(1.3 億)"))):
             v = [abs(float(r[key])) for _, key in items]
-            b = ax.bar(x + (k - 0.5) * 0.38, v, 0.36, color=c, label=lab)
+            b = ax.bar(x + (k - 1) * 0.28, v, 0.26, color=c, label=lab)
             for rect, val in zip(b, v):
                 ax.text(rect.get_x() + rect.get_width() / 2, val, f"{val:.2f}" if unit.startswith("10 秒で進") else f"{val:.0f}",
-                        ha="center", va="bottom", fontsize=8, color=INK)
+                        ha="center", va="bottom", fontsize=7, color=INK)
         ax.set_xticks(x, [n for n, _ in items])
         ax.set_ylabel(unit, fontsize=9)
         ax.grid(axis="y", color=GRID, lw=0.8)
