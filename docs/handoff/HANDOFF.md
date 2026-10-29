@@ -27,21 +27,20 @@ Read this first in a new session. Update it before stopping (see the `handoff` s
 - Final video: `scripts/assemble_video.py` -> `videos/final/open_duck_mini_final.mp4` (157 s; clips in `videos/final/src/`,
   cards by `scripts/video_cards.py`; title card follows the course slide; no experiment IDs in any caption). Gitignored.
   The end card has no GitHub URL yet (add after the repo is public, then re-run assemble_video.py).
-- Report: `docs/report/report.html` -> `docs/report/report.pdf` (PDF is gitignored; A4, 5 pages; `scripts/make_report_figs.py`,
-  `scripts/build_report.sh`). Needs the omnicampus account name for the final file name
-  `説明資料_PAI最終課題_<account>.pdf`. README updated (results, sources, reproduction steps).
+- Report: `docs/report/report.html` -> `docs/report/説明資料_PAI最終課題_142340.pdf` (PDF is gitignored; A4, 5 pages; `scripts/make_report_figs.py`,
+  `scripts/build_report.sh`). Account ID is 142340 (file name and YouTube title `PAI最終課題_142340`). README updated (results, sources, reproduction steps).
 - Scope is simulation only. Deadline 2026-11-02 10:00 (report PDF, public GitHub, 1-3 min YouTube MP4).
 
 ## Next steps
 1. User: watch the final video and read the report PDF; fix anything wrong.
 2. Make the GitHub repo public (needs the user's go-ahead; remote is origin, nothing pushed without being asked), then add the
    URL to the end card and rebuild the video.
-3. Upload to YouTube (title `PAI最終課題_<omnicampus account>`, description with the full CC BY 4.0 music credits); submit report
+3. Upload to YouTube (title `PAI最終課題_142340`, description with the full CC BY 4.0 music credits); submit report
    PDF, GitHub URL, video URL in omnicampus.
 4. Optional: jump footage for the failures section (needs a render script); E006-style turn-only tuning (AWS approval needed).
 
 ## Open questions
-- omnicampus account name (for the PDF and video titles).
+- None blocking.
 
 ## Running machines / cost
 - None. E005 instance i-09c5c564ed455814c terminated 2026-10-28 13:48 -0400; no volumes left.
