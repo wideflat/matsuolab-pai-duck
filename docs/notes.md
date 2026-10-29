@@ -160,3 +160,4 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 2026-10-29 report naming: short 2-page = 説明資料_PAI最終課題_142340.pdf (submission); long = 説明資料_詳細版_PAI最終課題_142340.pdf. README/HANDOFF updated.
 - 2026-10-29 YouTube title/description draft saved to docs/youtube_description.md (GitHub URL still to fill).
 - 2026-10-29 video: title card retitled to match report (ダンスと高度な動きに挑む); commands-scene title shortened (was cut off at the right edge); video rebuilt 157.2 s.
+- 2026-10-29 README aligned with report (purpose, reward wording, E005 numbers) before making the repo public; course slide jpg added to .gitignore. Scanned tracked files: no keys/tokens; commit author email is in history.
