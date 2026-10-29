@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>説明資料 Open Duck Mini でダンスと高度な動きに挑む</title>
+<!-- Source of the SHORT (2-page) report PDF; the full version is report.html. Build: scripts/build_report.sh. Figures come from scripts/make_report_figs.py.
+     No name, affiliation or e-mail address anywhere in this file (assignment rule). Numbers are copied from
+     docs/experiments.md; if a number here disagrees with that ledger, the ledger wins. -->
+<style>
+  @page { size: A4; margin: 13mm 15mm 13mm 15mm; }
+  :root { --ink:#0b0b0b; --ink2:#52514e; --line:#d9d8d3; --accent:#2a78d6; --soft:#f4f3ee; }
+  * { box-sizing: border-box; }
+  body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; color: var(--ink); background:#fff;
+         font-size: 9pt; line-height: 1.55; margin: 0; }
+  h1 { font-size: 19pt; margin: 0 0 2pt; line-height: 1.3; }
+  .sub { color: var(--ink2); font-size: 9.5pt; margin-bottom: 10pt; }
+  h2 { font-size: 12.5pt; margin: 15pt 0 4pt; padding-left: 8pt; border-left: 4pt solid var(--accent); break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 10pt 0 2pt; break-after: avoid; }
+  p { margin: 3pt 0 5pt; }
+  ul, ol { margin: 2pt 0 6pt; padding-left: 16pt; }
+  li { margin: 1pt 0; }
+  table { border-collapse: collapse; width: 100%; margin: 5pt 0 8pt; font-size: 8.6pt; line-height: 1.5; break-inside: avoid; }
+  th, td { border: 0.6pt solid var(--line); padding: 3pt 5pt; vertical-align: top; text-align: left; }
+  th { background: var(--soft); }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  figure { margin: 6pt 0 8pt; break-inside: avoid; }
+  figure img { width: 100%; display: block; border: 0.5pt solid var(--line); }
+  figcaption { font-size: 8.4pt; color: var(--ink2); margin-top: 2pt; line-height: 1.5; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+  .box { background: var(--soft); border-radius: 3pt; padding: 5pt 9pt; margin: 6pt 0; break-inside: avoid; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 8.4pt; background: var(--soft); padding: 0 2pt; }
+  .small { font-size: 8.4pt; color: var(--ink2); }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+<h1>Open Duck Mini でダンスと高度な動きに挑む</h1>
+<div class="sub">学習済みの歩行の上に制御を重ねて ／ Physical AI 応用編1 最終課題 説明資料／ MuJoCo Playground + PPO、シミュレーターのみ<br>作成日: 2026-10-29 ／ アカウント ID: 142340</div>
+
+<h2>1. 目的とやり方</h2>
+<p>小型二足歩行ロボット Open Duck Mini v2 に、音楽に合わせたダンスや、ジャンプ・スキップのような高度な動きをさせることが目的。まず強化学習(PPO)で歩行を学習し、次に、学習済みの歩きは変えずに、上に「速度指令を毎回計算する制御」を重ねて新しい動きをさせた。追加の学習は要らない。</p>
+<figure>
+<svg viewBox="0 0 720 232" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Hiragino Sans, sans-serif" role="img" aria-label="学習と上位制御の関係図">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#52514e"/></marker></defs>
+  <text x="10" y="14" font-size="11" fill="#52514e">① 歩行を学習する(GPU、約 23 分〜1 時間)</text>
+  <rect x="10" y="24" width="150" height="62" rx="5" fill="#f4f3ee" stroke="#d9d8d3"/>
+  <text x="85" y="48" font-size="11.5" text-anchor="middle" fill="#0b0b0b">公式の環境と手本</text>
+  <text x="85" y="66" font-size="9.5" text-anchor="middle" fill="#52514e">Open Duck Playground</text>
+  <rect x="205" y="24" width="165" height="62" rx="5" fill="#fff" stroke="#2a78d6" stroke-width="1.5"/>
+  <text x="287" y="46" font-size="11.5" text-anchor="middle" fill="#0b0b0b">PPO で学習</text>
+  <text x="287" y="63" font-size="9.5" text-anchor="middle" fill="#52514e">前後・横の速度追従の報酬を 2 倍</text>
+  <text x="287" y="77" font-size="9.5" text-anchor="middle" fill="#52514e">学習を 5,000 万 → 1.3 億ステップ</text>
+  <rect x="415" y="24" width="295" height="62" rx="5" fill="#2a78d6"/>
+  <text x="562" y="46" font-size="11.5" text-anchor="middle" fill="#fff">歩行の方策(小さな MLP、画像は使わない)</text>
+  <text x="562" y="63" font-size="10" text-anchor="middle" fill="#fff">観測 101 → 512 → 256 → 128 → 行動 14</text>
+  <text x="562" y="77" font-size="9.5" text-anchor="middle" fill="#fff">速度指令(前後・横・旋回)を受け、関節を動かす</text>
+  <line x1="160" y1="55" x2="203" y2="55" stroke="#52514e" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="370" y1="55" x2="413" y2="55" stroke="#52514e" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="10" y="122" font-size="11" fill="#52514e">② その上に、学習なしの制御を重ねる</text>
+  <g font-size="11" text-anchor="middle">
+  <rect x="415" y="148" width="92" height="62" rx="5" fill="#eb6834"/><text x="461" y="170" fill="#fff">道案内役</text><text x="461" y="186" font-size="9" fill="#fff">目標点へ向く・進む</text><text x="461" y="199" font-size="9" fill="#fff">指令を出す</text>
+  <rect x="518" y="148" width="92" height="62" rx="5" fill="#eb6834"/><text x="564" y="170" fill="#fff">サッカー</text><text x="564" y="186" font-size="9" fill="#fff">道案内役の発展</text><text x="564" y="199" font-size="9" fill="#fff">ボールを押す</text>
+  <rect x="621" y="148" width="89" height="62" rx="5" fill="#eb6834"/><text x="665" y="170" fill="#fff">ダンス</text><text x="665" y="186" font-size="9" fill="#fff">曲の拍ごとに</text><text x="665" y="199" font-size="9" fill="#fff">指令を切り替え</text>
+  </g>
+  <line x1="461" y1="146" x2="500" y2="88" stroke="#52514e" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="564" y1="146" x2="564" y2="88" stroke="#52514e" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="665" y1="146" x2="630" y2="88" stroke="#52514e" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="404" y="125" font-size="9.5" text-anchor="end" fill="#52514e">速度指令を毎回渡す →</text>
+  <rect x="10" y="148" width="360" height="62" rx="5" fill="#fff" stroke="#d9d8d3" stroke-dasharray="4 3"/>
+  <text x="190" y="170" font-size="11" text-anchor="middle" fill="#0b0b0b">挑戦したが、できなかったこと</text>
+  <text x="190" y="187" font-size="9.5" text-anchor="middle" fill="#52514e">ジャンプ: 物理的に不可(両足が浮いたのは最大 0.15 cm)</text>
+  <text x="190" y="201" font-size="9.5" text-anchor="middle" fill="#52514e">スキップ風の歩き: 手本を変えて学習したが再現できず</text>
+</svg>
+<figcaption>図 1 全体の流れ。青 = 学習、橙 = 学習なしの制御。ダンスもサッカーも、歩行の方策へ渡す速度指令の出し方だけを変えている。</figcaption></figure>
+
+<h2>2. 結果の一覧(すべて自分で測った値、各実験は乱数の種 1 本)</h2>
+<table>
+<tr><th style="width:21%">項目</th><th>結果</th><th style="width:12%">判定</th></tr>
+<tr><td><b>歩行</b></td><td>前後・横の速度追従の報酬を 2 倍にすると、歩き始めが約 1,100 万ステップ早く(39.6M → 28.8M)、5,000 万ステップ時点の速さが 0.056 → 0.119 m/s(約 2.1 倍)。</td><td>成功</td></tr>
+<tr><td><b>後退・旋回・横歩き</b></td><td>報酬 2 倍のまま学習を 5,000 万 → 1.3 億ステップにすると、10 秒の移動が後退 0.01 → 0.54 m、横歩き左 0.24 → 0.60 m・右 0.20 → 0.46 m、旋回 左 101 → 342°・右 30 → 243°。全基準の同時達成はなし。</td><td>部分的成功</td></tr>
+<tr><td><b>道案内役</b></td><td>4 つの目標点すべてに到達(転倒なし)。</td><td>成功</td></tr>
+<tr><td><b>サッカー</b></td><td>調整した 5 か所で 4 回、調整に使っていない 3 か所で 3 回ゴール。1 回は転倒。</td><td>部分的成功</td></tr>
+<tr><td><b>ダンス</b></td><td>2 曲とも約 1 分、転倒なし。首を振りながら回ると回転がほぼ止まることも分かった。</td><td>成功</td></tr>
+<tr><td><b>ジャンプ</b></td><td>手で書いた「しゃがむ → 伸ばす」72 通りで、足の裏の浮きは最大 0.15 cm(基準 1 cm)。</td><td>失敗</td></tr>
+<tr><td><b>スキップ風の歩き</b></td><td>足を 8 cm 上げる手本で 1 億ステップ学習したが、足の高さは 0.43 cm(基準 2.5 cm)。手本をまねなかった。</td><td>失敗</td></tr>
+</table>
+
+<h2>3. 学習の長さと報酬の効果(後退・横歩き・旋回)</h2>
+<figure><img src="fig_commands.png" alt="">
+<figcaption>図 2 同じ指令を 10 秒与えたときの動き。青 = 基本の学習(5,000 万ステップ)、橙 = 報酬 2 倍(5,000 万)、緑 = 報酬 2 倍のまま 1.3 億ステップ。橙と緑は報酬が同じで長さだけが違い、青と橙は長さが同じで報酬だけが違う。後退・旋回は、学習を長くした緑で大きく増えた。</figcaption></figure>
+<p>変えた報酬は <code>tracking_lin_vel</code>(前後・横方向の速度への追従)の 1 つだけで、旋回の報酬など他は公式のまま。</p>
+
+<div class="two">
+<figure><img src="fig_nav.png" alt=""><figcaption>図 3 道案内役が正方形の 4 点を回る(上から見た地図つき)。</figcaption></figure>
+<figure><img src="fig_soccer.png" alt=""><figcaption>図 4 サッカー。ボールの後ろへ回り込み、ゴールへ押す。</figcaption></figure>
+</div>
+
+<h2>4. 検証と限界</h2>
+<ul>
+<li><b>検証:</b> 測る前に成功・失敗の基準を決めて記録した(失敗も残した)。書き出した ONNX と JAX の方策の出力は、最大の差 5.1e-07 で一致(許容 1e-4)。</li>
+<li><b>限界:</b> 各設定の学習は 1 回(乱数の種を変えた繰り返しなし)。ランダム化への耐性は測っていない。サッカーの調整は 5 か所に合わせた。実機では試していない。</li>
+<li><b>費用と再現:</b> AWS g6.xlarge で累計約 3 ドル。手順・数値の全記録は GitHub リポジトリの README と <code>docs/experiments.md</code>(詳細版は <code>docs/report/report.html</code>)。</li>
+<li><b>出典:</b> Open Duck Project(Open_Duck_Playground b9be205、reference_motion_generator 3d7bc6f)、MuJoCo / MuJoCo Playground、Brax。音楽: Fluffing a Duck、Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com)、CC BY 4.0。</li>
+</ul>
+</body>
+</html>

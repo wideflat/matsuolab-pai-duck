@@ -1,0 +1,35 @@
+{
+  "music": "videos/music/Monkeys Spinning Monkeys.mp3",
+  "music_credit": "Music: Monkeys Spinning Monkeys - Kevin MacLeod (incompetech.com) / CC BY 4.0",
+  "bpm": 144.0,
+  "first_beat": 0.412,
+  "beats_per_gait_cycle": 1,
+  "moves": {
+    "pose":     {"label": "ポーズ",           "cmd": [0.0, 0.0, 0.0],    "head": {}},
+    "nod":      {"label": "うなずき",         "cmd": [0.0, 0.0, 0.0],    "head": {"head_pitch": [0.3, 2]}},
+    "look":     {"label": "きょろきょろ",     "cmd": [0.0, 0.0, 0.0],    "head": {"head_yaw": [0.9, 8]}},
+    "tilt":     {"label": "首かしげ",         "cmd": [0.0, 0.0, 0.0],    "head": {"head_roll": [0.4, 4]}},
+    "march":    {"label": "前進",             "cmd": [0.15, 0.0, 0.0],   "head": {}},
+    "back":     {"label": "後退",             "cmd": [-0.15, 0.0, 0.0],  "head": {}},
+    "side_l":   {"label": "左へカニ歩き",     "cmd": [0.0, 0.2, 0.0],    "head": {"head_roll": [0.25, 4]}},
+    "side_r":   {"label": "右へカニ歩き",     "cmd": [0.0, -0.2, 0.0],   "head": {"head_roll": [0.25, 4]}},
+    "diag_fl":  {"label": "左ななめ前へ",     "cmd": [0.15, 0.2, 0.0],   "head": {}},
+    "diag_fr":  {"label": "右ななめ前へ",     "cmd": [0.15, -0.2, 0.0],  "head": {}},
+    "diag_bl":  {"label": "左ななめ後ろへ",   "cmd": [-0.15, 0.2, 0.0],  "head": {}},
+    "diag_br":  {"label": "右ななめ後ろへ",   "cmd": [-0.15, -0.2, 0.0], "head": {}},
+    "spin_l":   {"label": "スピン(左)",       "cmd": [0.0, 0.0, 1.0],    "head": {}},
+    "spin_r":   {"label": "スピン(右)",       "cmd": [0.0, 0.0, -1.0],   "head": {}},
+    "arc_l":    {"label": "左に弧を描いて",   "cmd": [0.15, 0.0, 0.6],   "head": {}}
+  },
+  "sequence": [
+    ["pose", 4], ["look", 8], ["nod", 4],
+    ["march", 8], ["back", 8],
+    ["spin_l", 16],
+    ["diag_fl", 4], ["diag_fr", 4], ["diag_bl", 4], ["diag_br", 4],
+    ["spin_r", 16],
+    ["side_l", 8], ["side_r", 8],
+    ["arc_l", 16],
+    ["tilt", 8],
+    ["spin_l", 16], ["nod", 4], ["pose", 4]
+  ]
+}

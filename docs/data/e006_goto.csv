@@ -1,0 +1,5 @@
+target_x,target_y,reached,t_s,d_final_m,max_off_line_m,fell_at,onnx_sha8
+1.0,0.0,True,8.26,0.049,0.027,,cbbee2e3
+0.5,0.5,True,6.52,0.048,0.059,,cbbee2e3
+0.5,-0.5,True,6.78,0.047,0.061,,cbbee2e3
+-0.5,0.0,True,8.92,0.048,0.070,,cbbee2e3

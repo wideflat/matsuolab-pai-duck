@@ -9,3 +9,9 @@ wandb/
 runs/
 .ipynb_checkpoints/
 .DS_Store
+.claude/compact/
+.claude/settings.local.json
+external/
+*.pdf
+.venv-refgen/
+PAI応用1_最終課題_スライド.jpg
