@@ -155,3 +155,4 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 10/29 omnicampus のアカウント ID は 142340（ユーザー指定）。レポートは `docs/report/説明資料_PAI最終課題_142340.pdf`（git 管理外）に出力、YouTube のタイトルは `PAI最終課題_142340`。
 - 2026-10-29 report revised per review: removed emphasis, summary split by topic, 3-way comparison (E003/E004/E005) because E005 differs from E003 in both reward x2 and length; added model structure (MLP 101-512-256-128-28, ~220k params), date and account ID; video commands caption now says reward and length both differ. PDF and video rebuilt (157.2 s).
 - 2026-10-29 report title changed to 'Open Duck Mini でダンスと高度な動きに挑む' (overview opening rewritten, README title aligned); PDF rebuilt.
+- 2026-10-29 report: bold labels in sections 1 and 3; clarified that only tracking_lin_vel (x/y velocity tracking, so backward and sideways too) was doubled, tracking_ang_vel unchanged.
