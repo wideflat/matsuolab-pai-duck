@@ -38,3 +38,6 @@
 4. 上位の制御: `scripts/eval_goto.py`(道案内役)、`scripts/eval_soccer.py`(サッカー)、`scripts/dance.py --config configs/dance_*.json`(ダンス)、`scripts/jump_test.py`。
 5. 一致検査: `scripts/check_onnx_parity.py`(使い方は先頭の説明)。
 6. 動画とレポート: `scripts/assemble_video.py`、`scripts/make_report_figs.py`、`scripts/build_report.sh`。
+
+## ライセンス
+MIT(自分で書いたコードと文書。[LICENSE](LICENSE))。出典の項に挙げた外部のコード・データ・音楽は、それぞれの提供元の条件に従う。
