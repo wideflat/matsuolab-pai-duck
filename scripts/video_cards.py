@@ -77,9 +77,9 @@ def card_title():
     d.text((60, 50), "Physical AI 応用編1", font=font(38), fill=INK)
     d.text((60, 100), "知能ロボティクス講座", font=font(32), fill=INK)
     spaced(d, (60, 238), "最終課題  FINAL PROJECT", font(18), INK2, 5)
-    d.text((60, 280), "Open Duck Mini を", font=font(58), fill=INK, stroke_width=1, stroke_fill=INK)
-    d.text((60, 360), "強化学習で歩かせる", font=font(58), fill=INK, stroke_width=1, stroke_fill=INK)
-    for i, line in enumerate(["MuJoCo Playground + PPO で学習し、", "学習済みの歩きの上に制御を重ねて、", "点から点への移動、サッカー、ダンスまで。", "すべてシミュレーション(実機は使っていません)"]):
+    d.text((60, 280), "Open Duck Mini で", font=font(48), fill=INK, stroke_width=1, stroke_fill=INK)
+    d.text((60, 355), "ダンスと高度な動きに挑む", font=font(48), fill=INK, stroke_width=1, stroke_fill=INK)
+    for i, line in enumerate(["学習済みの歩行の上に制御を重ねて、", "ダンス・サッカー・点から点への移動へ。", "ジャンプやスキップ風の歩きにも挑戦(できず)。", "すべてシミュレーション(実機は使っていません)"]):
         d.text((60, 470 + i * 36), line, font=font(22), fill=INK2)
     d.text((60, 636), "松尾・岩澤研究室", font=font(28), fill=INK)
     spaced(d, (60, 676), "MATSUO-IWASAWA LAB UTOKYO", font(13), INK2, 2)
