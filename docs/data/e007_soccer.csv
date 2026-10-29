@@ -1,0 +1,6 @@
+ball_x0,ball_y0,goal,goal_at_s,fell_at,t_end_s,ball_end_x,ball_end_y,mode_switches,onnx_sha8
+0.5,0.0,False,,,90.00,0.902,0.127,35,cbbee2e3
+0.5,0.35,False,,,90.00,0.545,0.382,34,cbbee2e3
+0.6,-0.35,False,,,90.00,1.158,-0.006,32,cbbee2e3
+1.0,0.5,False,,,90.00,1.255,0.389,33,cbbee2e3
+-0.4,0.2,False,,,90.00,-0.400,0.202,33,cbbee2e3
