@@ -57,14 +57,32 @@ def blank():
     return img, d
 
 
+def spaced(d, xy, text, f, fill, gap):
+    """Draw text with extra letter spacing (the course slide's English subtitle is widely spaced)."""
+    x, y = xy
+    for ch in text:
+        d.text((x, y), ch, font=f, fill=fill)
+        x += d.textlength(ch, font=f) + gap
+
+
 def card_title():
-    img, d = blank()
-    d.text((90, 150), "東大 松尾研「フィジカルAI応用編」最終課題", font=font(26), fill=INK2)
-    d.text((90, 215), "Open Duck Mini を", font=font(80), fill=INK)
-    d.text((90, 315), "強化学習で歩かせる", font=font(80), fill=INK)
-    d.text((90, 450), "MuJoCo Playground + PPO で学習  /  学習済みの方策の上に制御を重ねて、", font=font(28), fill=INK2)
-    d.text((90, 492), "点から点への移動、サッカー、ダンスまで", font=font(28), fill=INK2)
-    d.text((90, 620), "すべてシミュレーション(実機は使っていません)", font=font(24), fill=INK2)
+    """Follows the course's final-project slide: course name top left, lab name bottom left, olive diagonal bands right."""
+    img = Image.new("RGB", (W, H), "#ffffff")
+    d = ImageDraw.Draw(img)
+    k = W / 1920
+    band = "#b1ae90"
+    for pts in ([(1240, 0), (1920, 0), (1920, 175), (1570, 1080), (800, 1080)],
+                [(1920, 420), (1920, 1080), (1640, 1080)]):
+        d.polygon([(x * k, y * k) for x, y in pts], fill=band)
+    d.text((60, 50), "Physical AI 応用編1", font=font(38), fill=INK)
+    d.text((60, 100), "知能ロボティクス講座", font=font(32), fill=INK)
+    spaced(d, (60, 238), "最終課題  FINAL PROJECT", font(18), INK2, 5)
+    d.text((60, 280), "Open Duck Mini を", font=font(58), fill=INK, stroke_width=1, stroke_fill=INK)
+    d.text((60, 360), "強化学習で歩かせる", font=font(58), fill=INK, stroke_width=1, stroke_fill=INK)
+    for i, line in enumerate(["MuJoCo Playground + PPO で学習し、", "学習済みの歩きの上に制御を重ねて、", "点から点への移動、サッカー、ダンスまで。", "すべてシミュレーション(実機は使っていません)"]):
+        d.text((60, 470 + i * 36), line, font=font(22), fill=INK2)
+    d.text((60, 636), "松尾・岩澤研究室", font=font(28), fill=INK)
+    spaced(d, (60, 676), "MATSUO-IWASAWA LAB UTOKYO", font(13), INK2, 2)
     return img
 
 
