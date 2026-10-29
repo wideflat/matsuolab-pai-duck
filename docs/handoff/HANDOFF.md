@@ -21,20 +21,28 @@ Read this first in a new session. Update it before stopping (see the `handoff` s
   official pkl 239/240, the other one is flipped in the official pkl). 8 cm foot height + imitation x2, 100M:
   failed, sole lift 0.43 cm (E005 0.8 cm). Policy ignores reference foot height. Stopped as pre-registered.
 - AWS: E009 instance terminated 22:50; nothing left. Total about $3.0 of $20.
-- Records: results in docs/experiments.md (one row per experiment), events in docs/notes.md. Spec 001
-  (docs/specs/) is the 10/27 plan and has not been updated with E006-E009.
+- E010 ONNX parity (`scripts/check_onnx_parity.py`): E005 129.8M, max diff 5.1e-07 (tol 1e-4), negative control fails. Pass.
+- Records: results in docs/experiments.md (one row per experiment), events in docs/notes.md. Spec 001 progress table and
+  spec 002 are up to date through E010.
+- Final video: `scripts/assemble_video.py` -> `videos/final/open_duck_mini_final.mp4` (157 s; clips in `videos/final/src/`,
+  cards by `scripts/video_cards.py`; title card follows the course slide; no experiment IDs in any caption). Gitignored.
+  The end card has no GitHub URL yet (add after the repo is public, then re-run assemble_video.py).
+- Report: `docs/report/report.html` -> `docs/report/report.pdf` (PDF is gitignored; A4, 5 pages; `scripts/make_report_figs.py`,
+  `scripts/build_report.sh`). Needs the omnicampus account name for the final file name
+  `説明資料_PAI最終課題_<account>.pdf`. README updated (results, sources, reproduction steps).
 - Scope is simulation only. Deadline 2026-11-02 10:00 (report PDF, public GitHub, 1-3 min YouTube MP4).
 
 ## Next steps
-1. Report: E003 -> E004 -> E005 story (reward weight, training length, checkpoint choice), command sensitivity
-   analysis (notes.md), dance pipeline. Collect figures from docs/data and videos/.
-2. YouTube video (1-3 min): learning progress + E003/E004 comparison + dance clips; add music credits.
-3. Make the GitHub repo public (needs user's go-ahead); README update.
-4. Optional: E006 turn-only tracking sigma (needs code in scripts/, AWS approval).
+1. User: watch the final video and read the report PDF; fix anything wrong.
+2. Make the GitHub repo public (needs the user's go-ahead; remote is origin, nothing pushed without being asked), then add the
+   URL to the end card and rebuild the video.
+3. Upload to YouTube (title `PAI最終課題_<omnicampus account>`, description with the full CC BY 4.0 music credits); submit report
+   PDF, GitHub URL, video URL in omnicampus.
+4. Optional: jump footage for the failures section (needs a render script); E006-style turn-only tuning (AWS approval needed).
 
 ## Open questions
-- None blocking.
+- omnicampus account name (for the PDF and video titles).
 
 ## Running machines / cost
 - None. E005 instance i-09c5c564ed455814c terminated 2026-10-28 13:48 -0400; no volumes left.
-  Total spent about $2.1 of $20.
+  Total spent about $3.0 of $20 (E009 instance also terminated; see above).
