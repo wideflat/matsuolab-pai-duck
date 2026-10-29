@@ -14,7 +14,10 @@ Usage (host, from the repo root):
       -v "$PWD/scripts:/scripts:ro" -v "$PWD/configs:/configs:ro" -v "$PWD/runs/refgen:/out" duck-refgen \
       python /scripts/refgen_sweep.py --overrides /configs/refgen_skip.json --out /out/skip --jobs 8
 
-Guarantees: fails if any grid point fails to generate or any recording has a knee bent backwards (<= 0 rad);
+Recordings with a knee bent backwards (<= 0 rad, a mirrored IK solution) are regenerated with low
+parallelism, up to RETRY_ROUNDS times.
+
+Guarantees: fails if any grid point fails to generate or any recording still has a knee bent backwards;
 every override key must already exist in the preset; each generator process runs single-threaded.
 """
 import argparse
@@ -30,6 +33,8 @@ import numpy as np
 
 DUCK = "open_duck_mini_v2"
 KNEES = [3, 14]  # left_knee, right_knee in the preset's joint order; both bend forward (positive) when walking
+RETRY_ROUNDS = 5
+RETRY_JOBS = 2
 
 
 def grid(props):
@@ -67,7 +72,10 @@ def main():
     rec, presets, logs = out / "recordings", out / "presets", out / "logs"
     for d in (rec, presets, logs):
         d.mkdir(parents=True, exist_ok=True)
-    (out / "preset_used.json").write_text(json.dumps(preset, indent=2))
+    used = out / "preset_used.json"
+    if used.exists() and json.loads(used.read_text()) != preset:
+        raise ValueError(f"{out} holds recordings from a different preset; use a new --out")
+    used.write_text(json.dumps(preset, indent=2))
 
     points = grid(props)[:a.limit]
     cmds = []
@@ -78,30 +86,49 @@ def main():
         cmds.append((i, [sys.executable, str(work / "open_duck_reference_motion_generator" / "gait_generator.py"),
                          "--duck", DUCK, "--preset", str(path), "--name", str(i), "--output_dir", str(rec)]))
 
-    # One thread per process: with 10 multithreaded processes the IK sometimes converged to the mirrored
-    # (backward-bent) right knee on 30/240 motions; the same motion run alone was correct.
-    env = dict(os.environ, OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
+    # One thread per process, to avoid oversubscribing the CPU (did not by itself fix the knee flips below).
+    env =dict(os.environ, OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
 
     def run(item):
         i, cmd = item
         with open(logs / f"{i}.log", "w") as f:
             return i, subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, cwd=work, env=env).returncode
 
-    with ThreadPoolExecutor(max_workers=a.jobs) as ex:
-        failed = [i for i, rc in ex.map(run, cmds) if rc != 0]
-    if failed:
-        raise RuntimeError(f"{len(failed)} grid points failed, e.g. {failed[:5]} (see {logs})")
+    def generate(items, jobs):
+        with ThreadPoolExecutor(max_workers=jobs) as ex:
+            failed = [i for i, rc in ex.map(run, items) if rc != 0]
+        if failed:
+            raise RuntimeError(f"{len(failed)} grid points failed, e.g. {failed[:5]} (see {logs})")
+
+    def flipped():
+        bad = []
+        for f in sorted(rec.glob("*.json")):
+            d = json.loads(f.read_text())
+            jp = np.array(d["Frames"])[:, d["Frame_offset"][0]["joints_pos"]:]
+            if jp[:, KNEES].min() <= 0:
+                bad.append(f)
+        return bad
+
+    have = {int(f.name.split("_")[0]) for f in rec.glob("*.json")}  # resume: same preset (checked above)
+    generate([c for c in cmds if c[0] not in have], a.jobs)
+    # Under parallel load the IK sometimes starts on the mirrored solution (one knee bent backwards, its hip
+    # and ankle compensating) and keeps it for the whole motion; 23-30 of 240 per run, single-threaded or
+    # not. The same grid point regenerated with little load comes out bent forwards, so retry those.
+    for rnd in range(RETRY_ROUNDS):
+        bad = flipped()
+        print(f"round {rnd}: {len(bad)} recordings with a knee bent backwards")
+        if not bad:
+            break
+        idx = {int(f.name.split("_")[0]) for f in bad}
+        for f in bad:
+            f.unlink()
+        generate([c for c in cmds if c[0] in idx], RETRY_JOBS)
     n_json = len(list(rec.glob("*.json")))
     if n_json != len(points):
         raise RuntimeError(f"expected {len(points)} recordings, found {n_json}")
-    flipped = []
-    for f in sorted(rec.glob("*.json")):
-        d = json.loads(f.read_text())
-        jp = np.array(d["Frames"])[:, d["Frame_offset"][0]["joints_pos"]:]
-        if jp[:, KNEES].min() <= 0:
-            flipped.append(f.name)
-    if flipped:
-        raise RuntimeError(f"{len(flipped)} recordings have a knee bent backwards, e.g. {flipped[:3]}")
+    bad = flipped()
+    if bad:
+        raise RuntimeError(f"{len(bad)} recordings still have a knee bent backwards, e.g. {[f.name for f in bad[:3]]}")
     subprocess.run([sys.executable, str(work / "scripts" / "fit_poly.py"), "--ref_motion", str(rec)],
                    cwd=out, check=True)
     print(f"done: {len(points)} motions -> {out / 'polynomial_coefficients.pkl'}")

@@ -14,6 +14,8 @@ Usage (from the repo root):
       --onnx checkpoints/baseline_e003/2026_10_28_034228_50462720.onnx --label "E003 最終 (50.5M)" \
       --vx 0.15 --seconds 8 --out videos/reference_vs_e003.mp4 --poster videos/reference_vs_e003.png
 
+--ref / --ref_label pick another reference pkl for the left panel (e.g. a regenerated set, E009).
+
 Guarantees: deterministic; the reference frame must have 40 dims and map onto 14 actuated joints,
 else it raises. Writes only --out and --poster.
 """
@@ -41,6 +43,8 @@ def main():
     p.add_argument("--seconds", type=float, required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--poster", required=True)
+    p.add_argument("--ref", default=REF, help="reference pkl for the left panel (default: official)")
+    p.add_argument("--ref_label", default="Placo の歩行生成器")
     a = p.parse_args()
 
     policy = DuckRollout(a.onnx, (a.vx, 0.0, 0.0))
@@ -51,7 +55,7 @@ def main():
     mujoco.mj_forward(m, d_ref)
     foot_ids = [m.geom(g).id for g in FOOT_GEOMS]
     floor_z = min(d_ref.geom_xpos[i][2] for i in foot_ids)
-    prm = PolyReferenceMotion(REF)
+    prm = PolyReferenceMotion(a.ref)
     ctrl_dt = 1.0 / prm.fps
 
     renderer = mujoco.Renderer(m, PANEL_H, PANEL_W)
@@ -88,7 +92,7 @@ def main():
         draw = ImageDraw.Draw(frame)
         draw.text((16, 10), f"手本(参照動作)と学習結果  指令: 前へ {a.vx} m/s", font=big, fill=INK)
         draw.text((W - 16, 10), f"t = {t:4.1f} s", font=big, fill=INK, anchor="ra")
-        panels = [(d_ref, "手本: Placo の歩行生成器(物理なし)", base_xy[0] - home_qpos[0], COLORS[0]),
+        panels = [(d_ref, f"手本: {a.ref_label}(物理なし)", base_xy[0] - home_qpos[0], COLORS[0]),
                   (policy.data, f"学習結果: {a.label}(物理あり)", policy.dx, COLORS[3])]
         for k, (data, title, dist, color) in enumerate(panels):
             renderer.update_scene(data, cam)
