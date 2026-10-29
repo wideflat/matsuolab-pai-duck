@@ -104,6 +104,7 @@ def card_end():
             y += 28
             d.text((90, y + 14), line, font=font(19), fill=INK2)
         y += 60
+    d.text((90, 650), "コードと実験の記録  github.com/wideflat/matsuolab-pai-duck", font=font(24), fill=INK)
     return img
 
 
