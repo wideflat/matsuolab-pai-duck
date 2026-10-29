@@ -4,7 +4,7 @@ Usage (from the repo root):
   PYTHONPATH=scripts .venv/bin/python scripts/assemble_video.py --out videos/final/open_duck_mini_final.mp4
 
 Storyboard (STORY below): title, reference vs trained, doubled forward reward, four commands, navigator, soccer,
-dance 1 (Monkeys Spinning Monkeys), failures card + two failure clips, dance 2 (Fluffing a Duck, second half),
+dance 1 (Monkeys Spinning Monkeys), dance 2 (Fluffing a Duck, second half), failures card + two failure clips,
 end card. Every content clip gets a one-line title and an explanation through video_cards.titled; the clips come
 from videos/final/src/ (rendered with plain-language labels, no experiment IDs).
 Only the two dance clips keep their music; every other part gets a silent track so the parts can be joined
@@ -46,14 +46,14 @@ STORY = [
     (SRC / "dance_monkeys.mp4", "ダンス: 曲のテンポに合わせて、指令を切り替えるだけ",
      "曲の拍(144 BPM)ごとに「前進・後退・スピン・カニ歩き」の指令を切り替え、首は別に動かす。歩く方策はそのまま。"
      "エンターテインメントとして踊らせた。", (13.3, 20.5, 0.5)),
+    (SRC / "dance_fluffing.mp4", "ダンス(2 曲目): 曲を変えても、振り付けの設定を変えるだけ",
+     "拍の数え方と指令の並べ方(振り付けの設定ファイル)を書き換えるだけで別の曲に対応でき、歩きの周期も曲のテンポに合わせている。",
+     (31.65, 35.7, 0.3)),
     ("videos/final/card_failures.mp4", None, None, None),
     (SRC / "skip.mp4", "できなかったこと: スキップ風の歩き",
      "足を 8 cm 高く上げる手本(左)を作り、まねさせて 1 億ステップ学習。学習結果(右)は足をほとんど上げず、すり足のままだった。", None),
     (SRC / "soccer_fall.mp4", "できなかったこと: サッカーでの転倒",
      "ボールがゴールポストに挟まって動かないのに、押し続けて後ろに倒れた(8 通りのうち 1 回)。", None),
-    (SRC / "dance_fluffing.mp4", "ダンス(2 曲目): 曲を変えても、振り付けの設定を変えるだけ",
-     "拍の数え方と指令の並べ方(振り付けの設定ファイル)を書き換えるだけで別の曲に対応でき、歩きの周期も曲のテンポに合わせている。",
-     (31.65, 35.7, 0.3)),
     ("videos/final/card_end.mp4", None, None, None),
 ]
 AUDIO_FMT = ["-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "192k"]
