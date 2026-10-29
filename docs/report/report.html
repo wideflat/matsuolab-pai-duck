@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>説明資料 Open Duck Mini を強化学習で歩かせる</title>
+<title>説明資料 Open Duck Mini でダンスと高度な動きに挑む</title>
 <!-- Source of the report PDF. Build: scripts/build_report.sh. Figures come from scripts/make_report_figs.py.
      No name, affiliation or e-mail address anywhere in this file (assignment rule). Numbers are copied from
      docs/experiments.md; if a number here disagrees with that ledger, the ledger wins. -->
@@ -35,11 +35,11 @@
 </head>
 <body>
 
-<h1>Open Duck Mini を強化学習で歩かせる</h1>
-<div class="sub">Physical AI 応用編1 最終課題 説明資料 ／ MuJoCo Playground (MJX) + PPO (Brax)、シミュレーターのみ(実機は使っていません)<br>作成日: 2026-10-29 ／ アカウント ID: 142340</div>
+<h1>Open Duck Mini でダンスと高度な動きに挑む</h1>
+<div class="sub">学習済みの歩行の上に制御を重ねて<br>Physical AI 応用編1 最終課題 説明資料 ／ MuJoCo Playground (MJX) + PPO (Brax)、シミュレーターのみ(実機は使っていません)<br>作成日: 2026-10-29 ／ アカウント ID: 142340</div>
 
 <h2>1. 概要と目的</h2>
-<p>小型二足歩行ロボット Open Duck Mini v2 を、MuJoCo Playground と PPO で歩かせる。公開されている学習環境(Open_Duck_Playground)を再現してから、報酬の重みと学習の長さを変えて比較し、さらに、学習済みの歩きは変えずに、上に制御を重ねて点から点への移動・サッカー・ダンスをさせた。できなかったこと(ジャンプ、スキップ風の歩き)も測って残した。</p>
+<p>小型二足歩行ロボット Open Duck Mini v2 に、音楽に合わせたダンスや、ジャンプ・スキップのような高度な動きをさせることを目的とした。そのために、まず MuJoCo Playground と PPO で歩行を学習した(公開されている Open_Duck_Playground を再現し、報酬の重みと学習の長さを変えて比較した)。次に、学習済みの歩きは変えずに、上に制御を重ねて、点から点への移動・サッカー・ダンスをさせた。ジャンプとスキップ風の歩きにも挑戦したが、できなかった。その結果も測って残した。</p>
 <div class="box">
 結果の要点(すべて自分で測った値。各実験は乱数の種 1 本)
 <ul>

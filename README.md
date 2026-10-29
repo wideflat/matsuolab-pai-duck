@@ -1,4 +1,4 @@
-# Open Duck Mini を強化学習で歩かせる
+# Open Duck Mini でダンスと高度な動きに挑む
 
 東京大学 松尾・岩澤研究室「Physical AI 応用編1」(知能ロボティクス講座)の最終課題。
 MuJoCo Playground (MJX) + PPO (Brax) で小型二足歩行ロボット Open Duck Mini v2 の歩行を学習し、ONNX に書き出してシミュレーター上で動かす。
