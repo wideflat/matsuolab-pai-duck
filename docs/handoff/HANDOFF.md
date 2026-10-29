@@ -27,7 +27,7 @@ Read this first in a new session. Update it before stopping (see the `handoff` s
 - Final video: `scripts/assemble_video.py` -> `videos/final/open_duck_mini_final.mp4` (157 s; clips in `videos/final/src/`,
   cards by `scripts/video_cards.py`; title card follows the course slide; no experiment IDs in any caption). Gitignored.
   The end card has no GitHub URL yet (add after the repo is public, then re-run assemble_video.py).
-- Report: `docs/report/report.html` -> `docs/report/説明資料_PAI最終課題_142340.pdf` (PDF is gitignored; A4, 5 pages; `scripts/make_report_figs.py`,
+- Report: submission version = 2-page short `docs/report/report_short.html` -> `docs/report/説明資料_PAI最終課題_142340.pdf`; detailed version `docs/report/report.html` -> `説明資料_詳細版_PAI最終課題_142340.pdf` (PDFs are gitignored; A4, detail = 6 pages; build: `scripts/build_report.sh OUT.pdf [SRC.html]`; `scripts/make_report_figs.py`,
   `scripts/build_report.sh`). Account ID is 142340 (file name and YouTube title `PAI最終課題_142340`). README updated (results, sources, reproduction steps).
 - Scope is simulation only. Deadline 2026-11-02 10:00 (report PDF, public GitHub, 1-3 min YouTube MP4).
 

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>説明資料(短縮版) Open Duck Mini でダンスと高度な動きに挑む</title>
+<title>説明資料 Open Duck Mini でダンスと高度な動きに挑む</title>
 <!-- Source of the SHORT (2-page) report PDF; the full version is report.html. Build: scripts/build_report.sh. Figures come from scripts/make_report_figs.py.
      No name, affiliation or e-mail address anywhere in this file (assignment rule). Numbers are copied from
      docs/experiments.md; if a number here disagrees with that ledger, the ledger wins. -->
@@ -35,7 +35,7 @@
 </head>
 <body>
 <h1>Open Duck Mini でダンスと高度な動きに挑む</h1>
-<div class="sub">学習済みの歩行の上に制御を重ねて ／ Physical AI 応用編1 最終課題 説明資料(短縮版)／ MuJoCo Playground + PPO、シミュレーターのみ<br>作成日: 2026-10-29 ／ アカウント ID: 142340</div>
+<div class="sub">学習済みの歩行の上に制御を重ねて ／ Physical AI 応用編1 最終課題 説明資料／ MuJoCo Playground + PPO、シミュレーターのみ<br>作成日: 2026-10-29 ／ アカウント ID: 142340</div>
 
 <h2>1. 目的とやり方</h2>
 <p>小型二足歩行ロボット Open Duck Mini v2 に、音楽に合わせたダンスや、ジャンプ・スキップのような高度な動きをさせることが目的。まず強化学習(PPO)で歩行を学習し、次に、学習済みの歩きは変えずに、上に「速度指令を毎回計算する制御」を重ねて新しい動きをさせた。追加の学習は要らない。</p>
@@ -99,7 +99,7 @@
 <ul>
 <li><b>検証:</b> 測る前に成功・失敗の基準を決めて記録した(失敗も残した)。書き出した ONNX と JAX の方策の出力は、最大の差 5.1e-07 で一致(許容 1e-4)。</li>
 <li><b>限界:</b> 各設定の学習は 1 回(乱数の種を変えた繰り返しなし)。ランダム化への耐性は測っていない。サッカーの調整は 5 か所に合わせた。実機では試していない。</li>
-<li><b>費用と再現:</b> AWS g6.xlarge で累計約 3 ドル。手順・数値の全記録は GitHub リポジトリの README と <code>docs/experiments.md</code>(詳しい説明資料は別紙)。</li>
+<li><b>費用と再現:</b> AWS g6.xlarge で累計約 3 ドル。手順・数値の全記録は GitHub リポジトリの README と <code>docs/experiments.md</code>(詳細版は <code>docs/report/report.html</code>)。</li>
 <li><b>出典:</b> Open Duck Project(Open_Duck_Playground b9be205、reference_motion_generator 3d7bc6f)、MuJoCo / MuJoCo Playground、Brax。音楽: Fluffing a Duck、Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com)、CC BY 4.0。</li>
 </ul>
 </body>

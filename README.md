@@ -2,7 +2,7 @@
 
 東京大学 松尾・岩澤研究室「Physical AI 応用編1」(知能ロボティクス講座)の最終課題。
 MuJoCo Playground (MJX) + PPO (Brax) で小型二足歩行ロボット Open Duck Mini v2 の歩行を学習し、ONNX に書き出してシミュレーター上で動かす。
-**実機は使わず、シミュレーターのみ。** 説明資料(レポート)の元は [docs/report/report.html](docs/report/report.html)(PDF は `scripts/build_report.sh` で作る。PDF は .gitignore で git 管理外、提出は omnicampus)。
+**実機は使わず、シミュレーターのみ。** 説明資料(レポート)の元は、提出用の 2 ページ版 [docs/report/report_short.html](docs/report/report_short.html) と、詳細版 [docs/report/report.html](docs/report/report.html)(PDF は `scripts/build_report.sh` で作る。PDF は .gitignore で git 管理外、提出は omnicampus)。
 
 ## できたこと(すべて自分で測った値。実験の正本は [docs/experiments.md](docs/experiments.md))
 | 内容 | 結果 |
