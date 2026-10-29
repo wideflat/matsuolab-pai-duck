@@ -13,3 +13,4 @@ runs/
 .claude/settings.local.json
 external/
 *.pdf
+.venv-refgen/
