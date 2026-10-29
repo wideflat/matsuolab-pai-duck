@@ -3,10 +3,10 @@
 Usage (from the repo root):
   PYTHONPATH=scripts .venv/bin/python scripts/assemble_video.py --out videos/final/open_duck_mini_final.mp4
 
-Storyboard (STORY below): title, reference vs E003, E003 vs E004, E003 vs E005 under four commands, navigator,
-soccer, dance 1 (Monkeys Spinning Monkeys, the three spins), failures card + two failure clips, dance 2
-(Fluffing a Duck, from the second half), end card. Clips that already carry their own captions are used as is;
-reference_vs_e003 (344 px high, no explanation) gets a caption through video_cards.caption.
+Storyboard (STORY below): title, reference vs trained, doubled forward reward, four commands, navigator, soccer,
+dance 1 (Monkeys Spinning Monkeys), failures card + two failure clips, dance 2 (Fluffing a Duck, second half),
+end card. Every content clip gets a one-line title and an explanation through video_cards.titled; the clips come
+from videos/final/src/ (rendered with plain-language labels, no experiment IDs).
 Only the two dance clips keep their music; every other part gets a silent track so the parts can be joined
 with stream copy. Dance cut points come from the beat grid in configs/dance_*.json (first_beat + beats/bpm),
 see CUTS.
@@ -18,31 +18,43 @@ import argparse
 import subprocess
 from pathlib import Path
 
-from video_cards import caption
+from video_cards import titled
 
 PARTS = Path("videos/final/parts")
-# (name, input, cut start s, cut length s or None, fade audio s). Cut times: Monkeys spin_l begins at
-# 0.412 + 32 * 60/144 = 13.75 s and spin_r ends at 0.412 + 80 * 60/144 = 33.75 s; Fluffing march_shake begins at
-# 0.473 + 64 * 60/122 = 31.95 s and the dance ends at 67.4 s.
-CUTS = {
-    "dance_monkeys": ("videos/dance_monkeys.mp4", 13.3, 20.5, 0.5),
-    "dance_fluffing": ("videos/dance_fluffing_v2.mp4", 31.65, 35.7, 0.3),
-}
-REF_CAPTION = ("左は手本(Placo の歩行生成器)、右は 5,000 万ステップ学習した E003。同じ指令 0.15 m/s でも、"
-               "4 秒で手本は 0.62 m、学習結果は 0.21 m しか進まない")
+SRC = Path("videos/final/src")  # clips re-rendered without experiment IDs in their labels
+# Dance cut points (s): Monkeys spin_l begins at 0.412 + 32 * 60/144 = 13.75 s and spin_r ends at
+# 0.412 + 80 * 60/144 = 33.75 s; Fluffing march_shake begins at 0.473 + 64 * 60/122 = 31.95 s, the dance ends 67.4 s.
+# Each STORY item: (input, title, explanation, cut) with cut = None or (start s, length s, audio fade s).
+# No experiment IDs (E003...) in any text: the viewer does not know them.
 STORY = [
-    "videos/final/card_title.mp4",
-    "CAPTION:videos/reference_vs_e003.mp4",
-    "videos/e003_vs_e004.mp4",
-    "videos/final/clip_e003_vs_e005_commands.mp4",
-    "videos/final/clip_navigator.mp4",
-    "videos/soccer_held_out_03_06.mp4",
-    "CUT:dance_monkeys",
-    "videos/final/card_failures.mp4",
-    "videos/final/clip_skip_failed.mp4",
-    "videos/final/clip_soccer_fall.mp4",
-    "CUT:dance_fluffing",
-    "videos/final/card_end.mp4",
+    ("videos/final/card_title.mp4", None, None, None),
+    (SRC / "reference.mp4", "まず、手本をまねて歩く",
+     "左が手本の歩き、右は手本をまねるよう学習したロボット(基本の設定で 5,000 万ステップ)。同じ前進の指令でも、"
+     "4 秒で手本は 0.62 m、学習結果は 0.21 m と、まだ届かない。", None),
+    (SRC / "reward_x2.mp4", "前進の報酬を 2 倍にしたら、歩き始めが早くなった",
+     "上が基本の設定、下が前進の報酬を 2 倍にしたもの。歩き始めは約 1,100 万ステップ早く、"
+     "最終的な速さは 0.056 → 0.119 m/s と約 2 倍になった。", None),
+    (SRC / "commands.mp4", "長く学習すると、後ろ・回転・横歩きもできるようになった",
+     "同じ指令を出して比べた。左(5,000 万ステップ)は前進以外ほとんど動かない。右(報酬 2 倍で 1.3 億ステップ)は、"
+     "4 秒で後退 0.27 m、左旋回 133°、横歩き 0.24 m。", None),
+    ("videos/final/clip_navigator.mp4", "道案内役: 学習済みの歩きに「行き先の指令」を出す",
+     "追加の学習はなし。目標点までの距離と向きのずれを毎回測り、ずれが大きければ旋回、合っていれば前進の指令を出す。"
+     "着いたら次の点へ(4 倍速)。", None),
+    (SRC / "soccer_goal.mp4", "サッカー: 道案内役を発展させて、ボールをゴールへ押す",
+     "道案内役の仕組みの応用。ボールの後ろへ回り込み、ゴールの方向に向きを合わせて押す。追加の学習はなし。"
+     "右上の地図の青い線が歩いた跡、赤い枠がゴール(2 倍速)。", None),
+    (SRC / "dance_monkeys.mp4", "ダンス: 曲のテンポに合わせて、指令を切り替えるだけ",
+     "曲の拍(144 BPM)ごとに「前進・後退・スピン・カニ歩き」の指令を切り替え、首は別に動かす。歩く方策はそのまま。"
+     "エンターテインメントとして踊らせた。", (13.3, 20.5, 0.5)),
+    ("videos/final/card_failures.mp4", None, None, None),
+    (SRC / "skip.mp4", "できなかったこと: スキップ風の歩き",
+     "足を 8 cm 高く上げる手本(左)を作り、まねさせて 1 億ステップ学習。学習結果(右)は足をほとんど上げず、すり足のままだった。", None),
+    (SRC / "soccer_fall.mp4", "できなかったこと: サッカーでの転倒",
+     "ボールがゴールポストに挟まって動かないのに、押し続けて後ろに倒れた(8 通りのうち 1 回)。", None),
+    (SRC / "dance_fluffing.mp4", "ダンス(2 曲目): 曲を変えても、振り付けの設定を変えるだけ",
+     "拍の数え方と指令の並べ方(振り付けの設定ファイル)を書き換えるだけで別の曲に対応でき、歩きの周期も曲のテンポに合わせている。",
+     (31.65, 35.7, 0.3)),
+    ("videos/final/card_end.mp4", None, None, None),
 ]
 AUDIO_FMT = ["-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "192k"]
 VIDEO_FMT = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-r", "30"]
@@ -81,19 +93,18 @@ def main():
     PARTS.mkdir(parents=True, exist_ok=True)
 
     parts = []
-    for i, item in enumerate(STORY):
+    for i, (src, title, text, cut) in enumerate(STORY):
         dst = PARTS / f"{i:02d}.mp4"
-        if item.startswith("CAPTION:"):
-            tmp = PARTS / f"{i:02d}_caption.mp4"
-            caption(item[len("CAPTION:"):], REF_CAPTION, "出発点: 手本どおりに歩く", str(tmp))
-            normalize(tmp, dst)
-        elif item.startswith("CUT:"):
-            src, start, length, fade = CUTS[item[len("CUT:"):]]
-            normalize(src, dst, start, length, fade)
+        if title is not None:
+            framed = PARTS / f"{i:02d}_titled.mp4"
+            titled(str(src), title, text, str(framed))
+            src = framed
+        if cut is None:
+            normalize(src, dst)
         else:
-            normalize(item, dst)
+            normalize(src, dst, *cut)
         parts.append(dst)
-        print(f"{dst}: {float(probe(dst)):5.1f} s  <- {item}")
+        print(f"{dst}: {float(probe(dst)):5.1f} s  <- {src}")
 
     listing = PARTS / "list.txt"
     listing.write_text("".join(f"file '{q.name}'\n" for q in parts))

@@ -91,7 +91,7 @@ def main():
         frame = Image.fromarray(renderer.render())
         draw = ImageDraw.Draw(frame)
         draw.rectangle([0, 0, W, 56], fill=SURFACE)
-        draw.text((20, 12), "ダックサッカー(学習なし:E005 の歩行方策 + 道案内役)", font=mid, fill=INK)
+        draw.text((20, 12), "ダックサッカー(追加の学習なし: 歩行方策 + 道案内役)", font=mid, fill=INK)
         draw.text((W - 20, 12), f"{r.t:5.1f} s  (×{a.speed:g} 速)", font=mid, fill=INK, anchor="ra")
         if info["goal_at"] is not None:
             draw.text((W / 2, H / 2 - 40), "GOAL!", font=ImageFont.truetype(FONT, 120), fill=COLORS[3],

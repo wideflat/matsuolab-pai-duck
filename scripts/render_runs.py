@@ -121,6 +121,7 @@ def main():
     p.add_argument("--seconds", type=float, required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--poster", required=True)
+    p.add_argument("--title", required=True)  # headline drawn above the panels
     p.add_argument("--traj_seconds", type=float)
     p.add_argument("--traj_png")
     a = p.parse_args()
@@ -153,7 +154,7 @@ def main():
         frame = Image.new("RGB", (W, H), SURFACE)
         frame.paste(strip, (0, H - STRIP))
         draw = ImageDraw.Draw(frame)
-        draw.text((16, 8), f"E003 と E004 の比較(同じ指令: 前へ {a.vx} m/s)", font=big, fill=INK)
+        draw.text((16, 8), f"{a.title}(同じ指令: 前へ {a.vx} m/s)", font=big, fill=INK)
         draw.text((W - 16, 8), f"t = {rollouts[0][0].t:4.1f} s", font=big, fill=INK, anchor="ra")
         for k, traj in enumerate(trajs):
             pts = to_px(traj[: n + 1])
@@ -174,7 +175,7 @@ def main():
                         pd.text((u, v + 4), f"{x:.1f} m", font=small, fill="white", anchor="ma")
                 pd.rectangle([0, 0, PANEL_W - 1, PANEL_H - 1], outline=c, width=4)
                 pd.rectangle([4, 4, 380, 34], fill=c)
-                pd.text((12, 8), f"{name}  {s / 1e6:.1f}M steps", font=mid, fill="white")
+                pd.text((12, 8), f"{name}  {s / 1e4:,.0f} 万ステップ", font=mid, fill="white")
                 state = "転倒" if r.fell_at is not None else f"{r.dx:+.2f} m"
                 pd.text((PANEL_W - 12, 42), state, font=big, fill="white", anchor="ra",
                         stroke_width=2, stroke_fill="black")

@@ -6,7 +6,8 @@ Subcommands (from the repo root):
       Re-encodes a clip onto a 1280x720 canvas with a caption. A 720-high clip gets a dark caption bar over its
       bottom edge; a shorter clip is centred on a light canvas with --head above and --text below. Audio, if any,
       is copied through.
-Also provides open_writer() for the render_*.py scripts.
+titled(inp, title, text, out): clip scaled into a 1200x540 box between a title line and a 1-2 line explanation
+(used by assemble_video.py). Also provides open_writer() for the render_*.py scripts.
 
 Guarantees: deterministic; every card string is in this file (no external input); caption raises if the input is
 not 1280 wide or is taller than 720.
@@ -20,6 +21,7 @@ from render_compare import COLORS, FONT, FPS, INK, INK2, SURFACE
 
 W, H = 1280, 720
 FADE = 0.4  # s
+BOX_W, BOX_H, TITLE_H = 1200, 540, 78  # clip box and title band used by titled()
 SONGS = ["Fluffing a Duck", "Monkeys Spinning Monkeys"]
 CC = "Licensed under Creative Commons: By Attribution 4.0 / https://creativecommons.org/licenses/by/4.0/"
 
@@ -91,7 +93,7 @@ def card_failures():
     img, d = blank()
     d.text((90, 60), "できなかったこと", font=font(56), fill=INK)
     rows = [("ジャンプ", "72 通りの「しゃがんで伸ばす」動きを試したが、両足が浮いたのは最大 0.02 秒・0.15 cm。バク転に要る高さの見積もりは約 11 cm"),
-            ("スキップ風の歩き", "足を 8 cm 上げる手本で 1 億ステップ学習しても、足は 0.4 cm しか上がらず(E005 は 0.8 cm)。方策は手本の足の高さをまねしなかった"),
+            ("スキップ風の歩き", "足を 8 cm 上げる手本で 1 億ステップ学習しても、足は 0.4 cm しか上がらず(ふつうの歩きでも 0.8 cm)。方策は手本の足の高さをまねしなかった"),
             ("サッカー", "ゴールポストにボールが挟まると、押し続けて転倒(8 通り中 1 回)")]
     y = 170
     for i, (head, body) in enumerate(rows):
@@ -155,6 +157,31 @@ def caption(inp, text, head, out):
     wr.stdin.close()
     if wr.wait() != 0 or rd.wait() != 0:
         raise RuntimeError("ffmpeg failed")
+
+
+def titled(inp, title, text, out):
+    """Put a clip on the light canvas: one-line title above, explanation (wrapped) below. Audio is copied through."""
+    probe = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                            "-of", "csv=s=x:p=0", inp], capture_output=True, text=True, check=True).stdout.strip()
+    w, h = (int(v) for v in probe.split("x"))
+    k = min(BOX_W / w, BOX_H / h)
+    cw, ch = int(w * k) // 2 * 2, int(h * k) // 2 * 2
+    x, y = (W - cw) // 2, TITLE_H
+    bg = Image.new("RGB", (W, H), SURFACE)
+    d = ImageDraw.Draw(bg)
+    d.rectangle([0, 0, 12, H], fill=COLORS[0])
+    d.text((40, 20), title, font=font(38), fill=INK)
+    lines = wrap(d, text, font(25), W - 80)
+    if len(lines) > 2 or y + ch + 14 + 34 * len(lines) > H:
+        raise ValueError(f"caption for {inp} does not fit: {len(lines)} lines, clip {cw}x{ch}")
+    for i, line in enumerate(lines):
+        d.text((40, y + ch + 14 + i * 34), line, font=font(25), fill=INK2)
+    png = out + ".bg.png"
+    bg.save(png)
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", png, "-i", inp, "-filter_complex",
+           f"[1:v]scale={cw}:{ch}[c];[0:v][c]overlay={x}:{y}:shortest=1,format=yuv420p[o]", "-map", "[o]", "-map", "1:a?",
+           "-c:v", "libx264", "-crf", "18", "-r", str(FPS), "-c:a", "copy", "-shortest", out]
+    subprocess.run(cmd, check=True)
 
 
 def main():

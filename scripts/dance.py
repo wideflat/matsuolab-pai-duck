@@ -126,7 +126,7 @@ def main():
         k = int((r.t - c["first_beat"]) // beat) if r.t >= c["first_beat"] else -1
         on_beat = k >= 0 and (r.t - c["first_beat"]) % beat < 0.12
         draw.rectangle([0, 0, W, 56], fill=SURFACE)
-        draw.text((20, 10), f"Open Duck Mini v2 ダンス(学習なし・{a.label} の歩行方策)", font=mid, fill=INK)
+        draw.text((20, 10), f"Open Duck Mini v2 ダンス(追加の学習なし・{a.label})", font=mid, fill=INK)
         draw.text((W - 20, 10), f"{c['bpm']:.0f} BPM  {r.t:5.1f} s", font=mid, fill=INK, anchor="ra")
         draw.rounded_rectangle([20, 72, 20 + 34 * 8 + 300, 124], radius=10, fill=COLORS[0])
         draw.text((36, 80), current[1]["label"], font=big, fill="white")
