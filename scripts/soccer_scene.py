@@ -120,6 +120,11 @@ def attach(rollout, model, ball_xy):
     return rollout
 
 
+def feet_xy(model, data):
+    """Midpoint of the two foot bodies (x, y). Drifts ~9 cm in a 6 s in-place turn vs 15-17 cm for the base."""
+    return data.xpos[[model.body("foot_assembly").id, model.body("foot_assembly_2").id], :2].mean(0)
+
+
 def ball_xy(data):
     return data.qpos[-7:-5].copy()
 

@@ -26,9 +26,13 @@ def wrap(a):
     return float(np.arctan2(np.sin(a), np.cos(a)))
 
 
-def command_to(data, target):
-    """Return (vx, vy, wz, d, alpha) to steer the base at `target` (x, y in world metres)."""
-    dx, dy = target[0] - data.qpos[0], target[1] - data.qpos[1]
+def command_to(data, target, pos=None):
+    """Return (vx, vy, wz, d, alpha) to steer at `target` (x, y in world metres).
+
+    `pos` is the point measured against the target (default: the base origin); heading is the base yaw.
+    """
+    pos = data.qpos[0:2] if pos is None else pos
+    dx, dy = target[0] - pos[0], target[1] - pos[1]
     d = float(np.hypot(dx, dy))
     alpha = wrap(np.arctan2(dy, dx) - yaw(data))
     wz = float(np.clip(K * alpha, -WZ_MAX, WZ_MAX))

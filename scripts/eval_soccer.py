@@ -24,22 +24,24 @@ from eval_checkpoints import sha8
 from navigator import command_to
 from striker import target
 
-BALL_STARTS = [(0.5, 0.0), (0.5, 0.35), (0.6, -0.35), (1.0, 0.5), (-0.4, 0.2)]
+BALL_STARTS = [("tuned", (0.5, 0.0)), ("tuned", (0.5, 0.35)), ("tuned", (0.6, -0.35)), ("tuned", (1.0, 0.5)),
+               ("tuned", (-0.4, 0.2)),  # used while tuning the striker (versions 1-3)
+               ("held_out", (0.8, -0.1)), ("held_out", (0.3, 0.6)), ("held_out", (-0.3, -0.4))]
 
 
 def run_trial(onnx, model, ball0, seconds, on_step=None):
     """Play one trial. on_step(rollout, info) is called after every physics step (for rendering)."""
     r = S.attach(DuckRollout(onnx, (0.0, 0.0, 0.0)), model, ball0)
-    mode, goal_at, switches = "line_up", None, 0
+    mode, goal_at, switches, vx = "line_up", None, 0, 0.0
     duck_path, ball_path, tgt = [], [], np.zeros(2)
     while r.t < seconds and r.fell_at is None and goal_at is None:
         if r.i % r.inf.decimation == 0:
-            duck = r.data.qpos[0:2].copy()
+            duck = S.feet_xy(r.model, r.data)
             ball = S.ball_xy(r.data)
-            tgt, new_mode = target(duck, ball, mode)
+            tgt, new_mode = target(duck, ball, mode, turning=vx == 0.0)
             switches += new_mode != mode
             mode = new_mode
-            vx, vy, wz, _, _ = command_to(r.data, tgt)
+            vx, vy, wz, _, _ = command_to(r.data, tgt, pos=duck)
             r.inf.commands[0:3] = [vx, vy, wz]
             duck_path.append(duck)
             ball_path.append(ball)
@@ -68,9 +70,9 @@ def main():
 
     model = S.build_model()
     rows, results = [], []
-    for ball0 in BALL_STARTS:
+    for group, ball0 in BALL_STARTS:
         res = run_trial(a.onnx, model, ball0, a.seconds)
-        row = {"ball_x0": ball0[0], "ball_y0": ball0[1], "goal": res["goal_at"] is not None,
+        row = {"set": group, "ball_x0": ball0[0], "ball_y0": ball0[1], "goal": res["goal_at"] is not None,
                "goal_at_s": "" if res["goal_at"] is None else f"{res['goal_at']:.2f}",
                "fell_at": "" if res["fell_at"] is None else f"{res['fell_at']:.2f}",
                "t_end_s": f"{res['t']:.2f}", "ball_end_x": f"{res['ball_end'][0]:.3f}",
@@ -87,7 +89,8 @@ def main():
         w.writerows(rows)
     print("wrote", a.out)
 
-    fig, axes = plt.subplots(1, len(results), figsize=(3.2 * len(results), 3.4), dpi=150, sharey=True)
+    fig, axes = plt.subplots(2, 4, figsize=(12.8, 6.8), dpi=150, sharex=True, sharey=True)
+    axes = axes.ravel()
     for ax, res, row in zip(axes, results, rows):
         draw_field(ax)
         ax.plot(res["duck_path"][:, 0], res["duck_path"][:, 1], color="#2a78d6", lw=1.2, label="duck")
@@ -95,13 +98,15 @@ def main():
         ax.add_patch(plt.Circle((row["ball_x0"], row["ball_y0"]), S.BALL_R, fill=False, color="#eb6834", ls="--"))
         ax.plot(0, 0, "o", color="#0b0b0b", ms=4)
         verdict = f"GOAL {row['goal_at_s']} s" if row["goal"] else ("FELL" if row["fell_at"] else "no goal")
-        ax.set_title(f"ball ({row['ball_x0']:+.1f}, {row['ball_y0']:+.2f})\n{verdict}", fontsize=9)
+        ax.set_title(f"{row['set']}: ball ({row['ball_x0']:+.1f}, {row['ball_y0']:+.2f})\n{verdict}", fontsize=9)
         ax.set_aspect("equal")
         ax.set_xlim(-0.9, 2.0)
         ax.set_ylim(-1.0, 1.0)
         ax.grid(color="#e0e0dc", lw=0.6)
+    for ax in axes[4:]:
         ax.set_xlabel("x [m]")
     axes[0].set_ylabel("y [m]")
+    axes[4].set_ylabel("y [m]")
     axes[0].legend(frameon=False, fontsize=8, loc="lower left")
     fig.suptitle("E007 duck soccer (E005 129.8M + navigator + striker)", fontsize=10)
     Path(a.png).parent.mkdir(parents=True, exist_ok=True)

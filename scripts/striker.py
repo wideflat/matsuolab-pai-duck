@@ -9,11 +9,13 @@ s = (duck - ball).u (negative = behind the ball), e = (duck - ball).n (lateral o
            on the front of the trunk, biased toward the goal so the line slowly straightens.
 Switches use hysteresis so the mode does not chatter at a boundary:
   around -> line_up when s < -AROUND_DONE;  line_up -> around when s > -AROUND_START
-  line_up -> push   within LINE_UP of the line-up point;
-  push -> line_up   when the ball is more than SLIP_DEG off the goal direction, or s > -AROUND_START.
-The duck pushes with the front of its trunk (the ball centre is ~0.16 m ahead of the base when touching).
+  line_up -> push   within LINE_UP of the line-up point, or anywhere inside a CONE_DEG cone behind the ball;
+  push -> line_up   when the ball is more than SLIP_DEG off the goal direction, or s > -AROUND_START,
+                    judged only while walking (turning in place moves the feet a few cm and caused dithering).
+Positions are the feet midpoint (soccer_scene.feet_xy): the duck turns about its feet, so that point moves
+less in an in-place turn than the base origin. The duck pushes with the front of its trunk.
 
-Guarantees: pure function of (duck position, ball position, mode); all walking goes through
+Guarantees: pure function of (duck position, ball position, mode, turning); all walking goes through
 navigator.command_to, so commands stay inside the trained ranges.
 """
 import numpy as np
@@ -29,6 +31,7 @@ LINE_UP = 0.10        # m, start pushing this close to the line-up point (turnin
                       # ~5 cm, so a tighter radius makes the bearing to the point swing and the duck dither)
 PUSH_AHEAD = 0.08     # m, steer at this point past the ball centre while pushing
 SLIP_DEG = 35.0       # deg, angle between duck->ball and ball->goal at which the push is abandoned
+CONE_DEG = 20.0       # deg, already inside this cone behind the ball (and s < -AROUND_DONE): push at once
 
 
 def frame(ball):
@@ -37,16 +40,20 @@ def frame(ball):
     return u, np.array([-u[1], u[0]])
 
 
-def target(duck_xy, ball, mode):
-    """Return (target_xy, new_mode) with mode in {"around", "line_up", "push"}."""
+def target(duck_xy, ball, mode, turning):
+    """Return (target_xy, new_mode) with mode in {"around", "line_up", "push"}.
+
+    duck_xy is the feet midpoint. `turning` is True while the last command turned in place (vx = 0); the
+    push is kept during such turns, because turning in place itself shifts the feet a few cm.
+    """
     u, n = frame(ball)
     rel = duck_xy - ball
     s, e = float(rel @ u), float(rel @ n)
     behind = ball - BEHIND * u
+    off = np.degrees(np.arctan2(abs(e), -s)) if s < 0 else 180.0
 
     if mode == "push":
-        off = np.degrees(np.arctan2(abs(e), -s)) if s < 0 else 180.0
-        if off <= SLIP_DEG and s < -AROUND_START:
+        if turning or (off <= SLIP_DEG and s < -AROUND_START):
             return ball + PUSH_AHEAD * u, "push"
         mode = "line_up"
     if mode == "around" and s < -AROUND_DONE:
@@ -58,6 +65,6 @@ def target(duck_xy, ball, mode):
         side = 1.0 if e >= 0 else -1.0
         along = 0.0 if s > 0 else -BEHIND
         return ball + side * LATERAL * n + along * u, "around"
-    if np.linalg.norm(duck_xy - behind) < LINE_UP:
+    if np.linalg.norm(duck_xy - behind) < LINE_UP or (s < -AROUND_DONE and off < CONE_DEG):
         return ball + PUSH_AHEAD * u, "push"
     return behind, "line_up"
