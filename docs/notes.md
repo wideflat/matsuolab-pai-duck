@@ -158,3 +158,4 @@ AWS（us-east-1、g6.xlarge）を使う。Colab Pro は使わない（ユーザ�
 - 2026-10-29 report: bold labels in sections 1 and 3; clarified that only tracking_lin_vel (x/y velocity tracking, so backward and sideways too) was doubled, tracking_ang_vel unchanged.
 - 2026-10-29 short (2-page) report added: docs/report/report_short.html -> 説明資料_短縮版_PAI最終課題_142340.pdf (gitignored); build_report.sh takes optional source html.
 - 2026-10-29 report naming: short 2-page = 説明資料_PAI最終課題_142340.pdf (submission); long = 説明資料_詳細版_PAI最終課題_142340.pdf. README/HANDOFF updated.
+- 2026-10-29 YouTube title/description draft saved to docs/youtube_description.md (GitHub URL still to fill).
