@@ -14,8 +14,8 @@ Usage (host, from the repo root):
       -v "$PWD/scripts:/scripts:ro" -v "$PWD/configs:/configs:ro" -v "$PWD/runs/refgen:/out" duck-refgen \
       python /scripts/refgen_sweep.py --overrides /configs/refgen_skip.json --out /out/skip --jobs 8
 
-Recordings with a knee bent backwards (<= 0 rad, a mirrored IK solution) are regenerated with low
-parallelism, up to RETRY_ROUNDS times.
+Recordings that start with a knee bent backwards (<= 0 rad at the first frame, a mirrored IK solution kept
+for the whole motion) are regenerated with low parallelism, up to RETRY_ROUNDS times.
 
 Guarantees: fails if any grid point fails to generate or any recording still has a knee bent backwards;
 every override key must already exist in the preset; each generator process runs single-threaded.
@@ -104,9 +104,9 @@ def main():
         bad = []
         for f in sorted(rec.glob("*.json")):
             d = json.loads(f.read_text())
-            jp = np.array(d["Frames"])[:, d["Frame_offset"][0]["joints_pos"]:]
-            if jp[:, KNEES].min() <= 0:
-                bad.append(f)
+            jp = np.array(d["Frames"])[0, d["Frame_offset"][0]["joints_pos"]:]
+            if jp[KNEES].min() <= 0:  # first frame only: the two fastest grid corners cross 0 mid-motion
+                bad.append(f)         # in the official pkl too, which is not this failure
         return bad
 
     have = {int(f.name.split("_")[0]) for f in rec.glob("*.json")}  # resume: same preset (checked above)
